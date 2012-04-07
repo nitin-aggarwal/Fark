@@ -33,6 +33,7 @@ class Tagger
 			try 
 			{
 				// POS Tagging computed
+				System.out.println(((ArticleDetails)article).getId());
 				StringBuilder strPOS = ((POSTagger)tagger).tagArticles(article);
 				
 				//Features - "unigramPOS","unigramWord","bigramPOS", "trigramPOS"
