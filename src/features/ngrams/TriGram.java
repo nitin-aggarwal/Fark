@@ -11,6 +11,10 @@ import java.util.Set;
 
 import entities.AbstractDB;
 
+/*
+ * This class is for features computation related to
+ * Tri-gram POS
+ */
 public class TriGram extends NGrams {
 
 	
@@ -33,7 +37,7 @@ private static TriGram triGram = null;
 	public void calculateFeatureVector(StringBuilder strPOS, AbstractDB article, File file, HashMap<String,Object> uniqueFeatureMap) throws IOException{
 
 		HashMap<String,Integer> map = new HashMap<String,Integer>();
-		StringBuilder bigramString = new StringBuilder();
+		StringBuilder trigramString = new StringBuilder();
 		Integer count;
 		String temp = strPOS.toString().trim();
 		BufferedWriter bw = null;
@@ -41,7 +45,6 @@ private static TriGram triGram = null;
 		{
 			bw = new BufferedWriter(new FileWriter(file));
 		
-			int taggerCounter = 0;
 			System.out.println(strPOS);
 			String[] spacesSplitter = temp.split("\\s");
 			int counter = 0;
@@ -51,23 +54,22 @@ private static TriGram triGram = null;
 				if(splitter.length == 2)
 				{
 					if(counter != 0)
-						bigramString.append(" "+splitter[1].toUpperCase());
+						trigramString.append(" "+splitter[1].toUpperCase());
 					else
-						bigramString.append(splitter[1].toUpperCase());
+						trigramString.append(splitter[1].toUpperCase());
 				}
 				counter++;
 			}
 		
-			String bigramPOSString = bigramString.toString();
-			String[] posTags = bigramPOSString.split("\\s");
-			int increment = 0;
-			for(String posTag = posTags[increment]; increment < posTags.length - 2; increment++)
+			String trigramPOSString = trigramString.toString();
+			String[] posTags = trigramPOSString.split("\\s");
+			for(int increment = 0; increment < posTags.length - 2; increment++)
 			{
-				String biGramtag = posTag + " " + posTags[increment + 1] + " "+ posTags[increment+2];
-				if((count = map.get(biGramtag)) != null) 
-					map.put(biGramtag, ++count);
+				String triGramtag = posTags[increment] + " " + posTags[increment + 1] + " "+ posTags[increment+2];
+				if((count = map.get(triGramtag)) != null) 
+					map.put(triGramtag, ++count);
 				else
-					map.put(biGramtag, 1);
+					map.put(triGramtag, 1);
 			}
 		
 			Set<Entry<String,Integer>> entrySet = map.entrySet();
@@ -75,7 +77,7 @@ private static TriGram triGram = null;
 	
 			while(iterator.hasNext())
 			{
-				Entry entry = iterator.next();
+				Entry<String, Integer> entry = iterator.next();
 				System.out.println(entry.getKey()+": "+entry.getValue());
 				bw.write(entry.getKey()+" "+entry.getValue());
 				bw.write("\n");
@@ -85,7 +87,7 @@ private static TriGram triGram = null;
 		}
 		catch(IOException e)
 		{
-			System.out.println("Exception Inside Trigram>>>>>");
+			System.out.println("Exception Inside Trigram Feature Computation");
 			e.printStackTrace();
 		}
 		finally

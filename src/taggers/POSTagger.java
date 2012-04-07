@@ -44,9 +44,5 @@ public class POSTagger extends Tagger {
 		//posWrite.close();
 		return strPOS;
 	}
-	
-
-
-	
 }
 

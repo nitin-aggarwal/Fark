@@ -11,6 +11,10 @@ import java.util.Set;
 
 import entities.AbstractDB;
 
+/*
+ * This class is for features computation related to
+ * Bi-gram POS
+ */
 public class BiGram extends NGrams {
 
 	
@@ -41,8 +45,6 @@ private static BiGram biGram = null;
 		{
 			bw = new BufferedWriter(new FileWriter(file));
 		
-		//String[] splitter = temp.split("[/\\s]"); 
-			int taggerCounter = 0;
 			System.out.println(strPOS);
 			String[] spacesSplitter = temp.split("\\s");
 			int counter = 0;
@@ -61,10 +63,9 @@ private static BiGram biGram = null;
 		
 			String bigramPOSString = bigramString.toString();
 			String[] posTags = bigramPOSString.split("\\s");
-			int increment = 0;
-			for(String posTag = posTags[increment]; increment < posTags.length - 1; increment++)
+			for(int increment = 0; increment < posTags.length - 1; increment++)
 			{
-				String biGramtag = posTag + " " + posTags[increment + 1];
+				String biGramtag = posTags[increment] + " " + posTags[increment + 1];
 				if((count = map.get(biGramtag)) != null) 
 					map.put(biGramtag, ++count);
 				else
@@ -76,7 +77,7 @@ private static BiGram biGram = null;
 	
 			while(iterator.hasNext())
 			{
-				Entry entry = iterator.next();
+				Entry<String, Integer> entry = iterator.next();
 				System.out.println(entry.getKey()+": "+entry.getValue());
 				bw.write(entry.getKey()+" "+entry.getValue());
 				bw.write("\n");
@@ -86,7 +87,7 @@ private static BiGram biGram = null;
 		}
 		catch(IOException e)
 		{
-			System.out.println("Exception Inside Bigram>>>>>");
+			System.out.println("Exception Inside Bigram Feature Computation");
 			e.printStackTrace();
 		}
 		finally

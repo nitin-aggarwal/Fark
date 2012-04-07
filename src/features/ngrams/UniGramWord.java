@@ -11,6 +11,10 @@ import java.util.Set;
 
 import entities.AbstractDB;
 
+/*
+ * This class is for features computation related to
+ * Uni-gram Words
+ */
 public class UniGramWord extends NGrams{
 	
 private static UniGramWord uniGramWord = null;
@@ -25,9 +29,7 @@ private static UniGramWord uniGramWord = null;
 		// write code for calculating unigram words here..
 		HashMap<String,Integer> map = new HashMap<String,Integer>();
 		Integer count;
-		//String content = ((ArticleDetails)article).getArticleContent().trim();
-		//String[] splitter = temp.split("[/\\s]"); 
-		//Pattern p = Pattern.compile("[?.,\"()<>](\\s)*");
+		
 		String temp = strPOS.toString().trim();
 		String[] spacesSplitter = temp.split("\\s");
 		BufferedWriter bw = null;
@@ -61,7 +63,7 @@ private static UniGramWord uniGramWord = null;
 	
 			while(iterator.hasNext())
 			{
-				Entry entry = iterator.next();
+				Entry<String, Integer> entry = iterator.next();
 				System.out.println(entry.getKey()+": "+entry.getValue());
 				bw.write(entry.getKey()+" "+entry.getValue());
 				bw.write("\n");
@@ -71,7 +73,7 @@ private static UniGramWord uniGramWord = null;
 		}
 		catch(IOException e)
 		{
-			System.out.println("Exception Inside UnigramWord>>>>>>>>>>>");
+			System.out.println("Exception Inside UnigramWord Feature Computation");
 			e.printStackTrace();
 		}
 		finally

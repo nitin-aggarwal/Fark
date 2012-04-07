@@ -10,7 +10,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import entities.AbstractDB;
-
+ 
+/*
+ * This class is for features computation related to
+ * Uni-gram POS
+ */
 public class UniGram extends NGrams {
 
 	private static UniGram uniGram = null;
@@ -40,8 +44,6 @@ public class UniGram extends NGrams {
 		{
 			bw = new BufferedWriter(new FileWriter(file));
 		
-			//String[] splitter = temp.split("[/\\s]"); 
-			int taggerCounter = 0;
 			System.out.println(strPOS);
 			String[] spacesSplitter = temp.split("\\s");
 		
@@ -63,7 +65,7 @@ public class UniGram extends NGrams {
 	
 			while(iterator.hasNext())
 			{
-				Entry entry = iterator.next();
+				Entry<String, Integer> entry = iterator.next();
 				System.out.println(entry.getKey()+" "+entry.getValue());
 				bw.write(entry.getKey()+" "+entry.getValue());
 				bw.write("\n");
@@ -73,15 +75,13 @@ public class UniGram extends NGrams {
 		}	
 		catch(IOException e)
 		{
-			System.out.println("Exception Inside Unigram>>>>>");
+			System.out.println("Exception Inside Unigram Feature Computation");
 			e.printStackTrace();
 		}
 		finally
 		{
 			bw.close();
 		}
-		
-		
 	}
 	
 	
