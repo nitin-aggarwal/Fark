@@ -72,9 +72,6 @@ class Tagger
 		}
 		
 		tagArticles();
-		
-		
-		
 	}
 	
 }
