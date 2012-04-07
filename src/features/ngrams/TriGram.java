@@ -30,7 +30,7 @@ private static TriGram triGram = null;
 
 	
 	@Override
-	public void calculateFeatureVector(StringBuilder strPOS, AbstractDB article, File file) throws IOException{
+	public void calculateFeatureVector(StringBuilder strPOS, AbstractDB article, File file, HashMap<String,Object> uniqueFeatureMap) throws IOException{
 
 		HashMap<String,Integer> map = new HashMap<String,Integer>();
 		StringBuilder bigramString = new StringBuilder();
@@ -81,6 +81,7 @@ private static TriGram triGram = null;
 				bw.write("\n");
 			}
 			bw.flush();
+			updateUniqueFeatureMap(map,uniqueFeatureMap);
 		}
 		catch(IOException e)
 		{

@@ -27,7 +27,7 @@ public class UniGram extends NGrams {
 		return uniGram;
 	}
 
-	public void calculateFeatureVector(StringBuilder strPOS, AbstractDB article , File file) throws IOException {
+	public void calculateFeatureVector(StringBuilder strPOS, AbstractDB article , File file, HashMap<String,Object> uniqueFeatureMap) throws IOException {
 		
 		// write code here for unigram calculation.
 		// the following regular expression is working,,,
@@ -69,6 +69,7 @@ public class UniGram extends NGrams {
 				bw.write("\n");
 			}
 			bw.flush();
+			updateUniqueFeatureMap(map,uniqueFeatureMap);
 		}	
 		catch(IOException e)
 		{
