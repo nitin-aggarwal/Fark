@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import constants.ConfigurationConstants;
+
 import entities.AbstractDB;
  
 /*
@@ -44,7 +46,8 @@ public class UniGram extends NGrams {
 		{
 			bw = new BufferedWriter(new FileWriter(file));
 		
-			System.out.println(strPOS);
+			if(ConfigurationConstants.debugMode)
+				System.out.println(strPOS);
 			String[] spacesSplitter = temp.split("\\s");
 		
 			for(String spaceSeperated: spacesSplitter)
@@ -66,7 +69,9 @@ public class UniGram extends NGrams {
 			while(iterator.hasNext())
 			{
 				Entry<String, Integer> entry = iterator.next();
-				System.out.println(entry.getKey()+" "+entry.getValue());
+				if(ConfigurationConstants.debugMode)
+					System.out.println(entry.getKey()+" "+entry.getValue());
+				
 				bw.write(entry.getKey()+" "+entry.getValue());
 				bw.write("\n");
 			}

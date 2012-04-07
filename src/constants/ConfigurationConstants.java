@@ -28,5 +28,7 @@ public class ConfigurationConstants {
     public static final String[] sites = {"others"};
     
     public static final String UNIQUE_FEATURE_DIRECTORY = "uniqueNGramFeatures";
+    
+    public static final boolean debugMode = false;
 }
 //"news.yahoo.com", "cnn.com",

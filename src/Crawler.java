@@ -65,7 +65,9 @@ public class Crawler {
             String str = formatter.format(date);
             URL = new StringBuilder(PREFIX_URL+str);
             crawler.retrieveInputStream(URL);
-            System.out.println(str);
+            
+            if(ConfigurationConstants.debugMode)
+            	System.out.println(str);
         }
     }   
    
@@ -114,15 +116,9 @@ public class Crawler {
         try
         {
             System.out.println("");
-            System.out.println("");
-            System.out.println("");
-            System.out.println("");
-            System.out.println("");
             System.out.println(feed.toString());
             System.out.println("");
-            System.out.println("");
-            System.out.println("");
-           
+            
             url = new URL(feed.toString());
            
             HttpURLConnection httpSource = (HttpURLConnection)url.openConnection();
@@ -174,14 +170,6 @@ public class Crawler {
                 String articleURL = articleElement.attr("href");
                 ad.setArticleURL(articleURL);
                
-               
-                //Article Domain e.g Entertainment , politics etc.
-               
-            //    Element articleCategoryElement = articleSourceElements.get(1);
-            //    String articleCategory = articleCategoryElement.text();
-            //    String articleDomain = articleCategory.substring(1, articleCategory.length()-1);
-            //    ad.setArticleDomain(articleDomain);
-               
                 // Now Source URL
                 Element articleSourceURLElement = articleSourceElements.get(1);
                 String articleSourceURL = articleSourceURLElement.text();
@@ -228,8 +216,8 @@ public class Crawler {
                 }
                 ad.setArticleContent(null);
                 ad.setArticleTitle(null);
-                //String content = Extractor.extractArticle(ad.getArticleURL());
-                System.out.println("Article::::"+ad);
+                if(ConfigurationConstants.debugMode)
+                	System.out.println("Article::::"+ad);
                 InsertDataSrv.save(ad);
             }   
         }
@@ -285,29 +273,27 @@ public class Crawler {
             {
                 ((ArticleDetails)article).setArticleTitle(ai.getTitle());
                 ((ArticleDetails)article).setArticleContent(ai.getContent());
-               // System.out.println(ai.getContent());
-               // System.out.println(ai.getTitle());
+               
+                if(ConfigurationConstants.debugMode)	{
+                	System.out.println(ai.getContent());
+                	System.out.println(ai.getTitle());
+                }
             }
      
           	 
             if(count%100 == 0)
             {	
             	System.out.println("");
-            	System.out.println("");
-            	System.out.println("");
-            	System.out.println("");
-            	System.out.println("commited>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+            	System.out.println("*******  Committed  *********>");
             	InsertDataSrv.commit();
            	 	RetrieveDataSrv.beginTransaction();
                
             }
-            System.out.println(articleURL);
-            //System.out.println("");
-            //System.out.println("");
-            System.out.println("");
-            //System.out.println("");
-            //System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-            count++;
+            if(ConfigurationConstants.debugMode)	{
+            	System.out.println(articleURL);
+            	System.out.println("");
+        	}
+        	count++;
         }
         InsertDataSrv.commit();
        
@@ -320,6 +306,7 @@ private String getParsedURL(String articleURL) {
 	}
 
 
+	@SuppressWarnings("unused")
 	private  void insertArticleContentFromSiteAndTag(String site, String tag) {
        
         List<AbstractDB> articleDetailList = null;
@@ -337,28 +324,27 @@ private String getParsedURL(String articleURL) {
             {
                 ((ArticleDetails)article).setArticleTitle(ai.getTitle().trim());
                 ((ArticleDetails)article).setArticleContent(ai.getContent().trim());
-                System.out.println(ai.getContent());
-                System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-                System.out.println("");
-                System.out.println("");
-                System.out.println("");
-                System.out.println("");
+                
+                if(ConfigurationConstants.debugMode) 	{
+                	System.out.println(ai.getContent());
+                
+                	System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+                	System.out.println("");
+                }
             }
             //InsertDataSrv.save(article);
-            //System.out.println(content);
             
             if(count%100 == 0)
             {	
-            	System.out.println("");
-            	System.out.println("");
-            	System.out.println("");
-            	System.out.println("");
-            	System.out.println("commited>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-            	InsertDataSrv.commit();
-           	 	RetrieveDataSrv.beginTransaction();
-               
+            	if(ConfigurationConstants.debugMode)	{
+            		System.out.println("");
+            		System.out.println(" ***********   committed  **********************");
+            	}
+            		InsertDataSrv.commit();
+           	 		RetrieveDataSrv.beginTransaction();
             }
-            System.out.println(articleURL);
+            if(ConfigurationConstants.debugMode)
+            	System.out.println(articleURL);
             count++;
            
         }

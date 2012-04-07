@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import constants.ConfigurationConstants;
+
 import entities.AbstractDB;
 
 /*
@@ -49,22 +51,16 @@ private static UniGramWord uniGramWord = null;
 						map.put(word, 1);
 				}
 			}
-		/*
-		for(String word:spacesSplitter)
-		{
-			if((count = map.get(word.toLowerCase())) != null) 
-				map.put(word.toLowerCase(), ++count);
-			else
-				map.put(word.toLowerCase(), 1);
-		}
-		*/
+		
 			Set<Entry<String,Integer>> entrySet = map.entrySet();
 			Iterator<Entry<String,Integer>> iterator = entrySet.iterator();
 	
 			while(iterator.hasNext())
 			{
 				Entry<String, Integer> entry = iterator.next();
-				System.out.println(entry.getKey()+": "+entry.getValue());
+				if(ConfigurationConstants.debugMode)
+					System.out.println(entry.getKey()+": "+entry.getValue());
+				
 				bw.write(entry.getKey()+" "+entry.getValue());
 				bw.write("\n");
 			}
@@ -88,6 +84,4 @@ private static UniGramWord uniGramWord = null;
 			uniGramWord = new UniGramWord();
 		return uniGramWord;
 	}
-
-
 }
