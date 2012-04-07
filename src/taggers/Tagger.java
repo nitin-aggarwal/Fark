@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import services.RetrieveDataSrv;
 import constants.ConfigurationConstants;
@@ -24,7 +24,9 @@ class Tagger
 	
 	public static void tagArticles()
 	{
-		List<AbstractDB> articleList = RetrieveDataSrv.retrieveRecordsbyTag("ArticleDetails", "amusing");
+		String[] tags = {"amusing","cool","obvious","interesting"};
+			
+		List<AbstractDB> articleList = RetrieveDataSrv.retrieveRecords("ArticleDetails", tags);
 		for(AbstractDB article:articleList)
 		{
 			try 
@@ -55,7 +57,7 @@ class Tagger
 				Iterator<Entry<String,Object>> iterator = entrySet.iterator();
 				while(iterator.hasNext())
 				{
-					Entry entry = iterator.next();
+					Entry<String, Object> entry = iterator.next();
 					//System.out.println(entry.getKey()+" "+entry.getValue());
 					bw.write((String)entry.getKey());
 					bw.write("\n");

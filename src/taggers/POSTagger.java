@@ -16,7 +16,7 @@ public class POSTagger extends Tagger {
 	
 	public POSTagger() throws IOException, ClassNotFoundException
 	{
-		tagger = new MaxentTagger("/src/taggers/bidirectional-distsim-wsj-0-18.tagger");
+		tagger = new MaxentTagger("taggers/bidirectional-distsim-wsj-0-18.tagger");
 	}
 	public StringBuilder tagArticles(AbstractDB article) throws IOException, ClassNotFoundException
 	{
