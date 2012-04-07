@@ -20,7 +20,7 @@ private static UniGramWord uniGramWord = null;
 		
 	}
 	
-	public void calculateFeatureVector(StringBuilder strPOS, AbstractDB article , File file) throws IOException {
+	public void calculateFeatureVector(StringBuilder strPOS, AbstractDB article , File file,HashMap<String,Object> uniqueFeatureMap) throws IOException {
 		
 		// write code for calculating unigram words here..
 		HashMap<String,Integer> map = new HashMap<String,Integer>();
@@ -67,6 +67,7 @@ private static UniGramWord uniGramWord = null;
 				bw.write("\n");
 			}
 			bw.flush();
+			updateUniqueFeatureMap(map,uniqueFeatureMap);
 		}
 		catch(IOException e)
 		{

@@ -1,8 +1,14 @@
 package taggers;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import services.RetrieveDataSrv;
 import constants.ConfigurationConstants;
@@ -14,7 +20,7 @@ import features.ngrams.NGrams;
 class Tagger
 {
 	private static Tagger tagger;
-	
+	private static HashMap<String,Object> uniqueFeatureMap = new HashMap<String,Object>();
 	
 	public static void tagArticles()
 	{
@@ -31,26 +37,54 @@ class Tagger
 				e.printStackTrace();
 			}
 		}
+		uniqueFeatures(uniqueFeatureMap);
 		
 	}
 	
+	
+	private static void uniqueFeatures(HashMap<String,Object> map)
+	{
+		BufferedWriter bw = null;
+		try
+		{
+			File file = NGrams.getFileHandle(ConfigurationConstants.UNIQUE_FEATURE_DIRECTORY,ConfigurationConstants.NGRAM_FEATURES+".txt");
+			if(file != null)
+			{
+				bw = new BufferedWriter(new FileWriter(file));
+				Set<Entry<String,Object>> entrySet = map.entrySet();
+				Iterator<Entry<String,Object>> iterator = entrySet.iterator();
+				while(iterator.hasNext())
+				{
+					Entry entry = iterator.next();
+					//System.out.println(entry.getKey()+" "+entry.getValue());
+					bw.write((String)entry.getKey());
+					bw.write("\n");
+				}
+				bw.flush();
+				bw.close();
+			}
+		}	
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	
 	private static void calculateFeatures(StringBuilder strPOS, AbstractDB article) {
 		
-		NGrams feature;
-		for(String featureName:ConfigurationConstants.NGRAM_FEATURES)
-		{
-			 feature = NGramFactory.createFeatureVector(featureName);
-			 File file = feature.getFileHandle(featureName,((ArticleDetails)article).getId()+".txt");
+			 NGrams feature;
+			 feature = NGramFactory.createFeatureVector(ConfigurationConstants.NGRAM_FEATURES);
+			 File file = NGrams.getFileHandle(ConfigurationConstants.NGRAM_FEATURES,((ArticleDetails)article).getId()+".txt");
 			 try
 			 {
 				 if(file != null)
-					 feature.calculateFeatureVector(strPOS,article,file);
+					 feature.calculateFeatureVector(strPOS,article,file,uniqueFeatureMap);
 			 }
 			 catch(Exception e)
 			 {
 				 e.printStackTrace();
 			 }
-		}
 	}
 
 	public static void main(String args[])

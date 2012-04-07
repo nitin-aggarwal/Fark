@@ -22,9 +22,11 @@ public class ConfigurationConstants {
     
     public static final String FILE_DIRECTORY_PATH = "/home/ca/myworkspace/Fark/src/files/";   
     
-    public static final String[] NGRAM_FEATURES = {"unigramPOS","unigramWord","bigramPOS", "trigramPOS"};
+    public static final String NGRAM_FEATURES = "unigramPOS";//,"unigramWord","bigramPOS", "trigramPOS"};
    
     // add sites
     public static final String[] sites = {"others"};
+    
+    public static final String UNIQUE_FEATURE_DIRECTORY = "uniqueNGramFeatures";
 }
 //"news.yahoo.com", "cnn.com",

@@ -29,7 +29,7 @@ private static BiGram biGram = null;
 	}
 
 	@Override
-	public void calculateFeatureVector(StringBuilder strPOS, AbstractDB article, File file) throws IOException{
+	public void calculateFeatureVector(StringBuilder strPOS, AbstractDB article, File file,HashMap<String,Object> uniqueFeatureMap) throws IOException{
 		// TODO Auto-generated method stub
 
 		HashMap<String,Integer> map = new HashMap<String,Integer>();
@@ -82,6 +82,7 @@ private static BiGram biGram = null;
 				bw.write("\n");
 			}
 			bw.flush();
+			updateUniqueFeatureMap(map,uniqueFeatureMap);
 		}
 		catch(IOException e)
 		{
