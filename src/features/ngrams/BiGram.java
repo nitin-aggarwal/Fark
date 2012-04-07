@@ -88,7 +88,9 @@ private static BiGram biGram = null;
 				bw.write("\n");
 			}
 			bw.flush();
-			updateUniqueFeatureMap(map,uniqueFeatureMap);
+			
+			if(uniqueFeatureMap != null)
+				updateUniqueFeatureMap(map,uniqueFeatureMap);
 		}
 		catch(IOException e)
 		{

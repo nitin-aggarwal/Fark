@@ -20,7 +20,7 @@ public class ConfigurationConstants {
     
     public static final String TAGGING_TYPE = "pos";
     
-    public static final String FILE_DIRECTORY_PATH = "/home/ca/myworkspace/Fark/src/files/";   
+    public static final String FILE_DIRECTORY_PATH = "files/";   
     
     public static final String NGRAM_FEATURES = "unigramPOS";//,"unigramWord","bigramPOS", "trigramPOS"};
    

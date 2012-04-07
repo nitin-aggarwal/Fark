@@ -25,21 +25,30 @@ class Tagger
 	public static void tagArticles()
 	{
 		String[] tags = {"amusing","cool","obvious","interesting"};
-			
+		long count = 0;	
 		List<AbstractDB> articleList = RetrieveDataSrv.retrieveRecords("ArticleDetails", tags);
+		System.out.println("Size of dataset: "+articleList.size());
 		for(AbstractDB article:articleList)
 		{
 			try 
 			{
+				// POS Tagging computed
 				StringBuilder strPOS = ((POSTagger)tagger).tagArticles(article);
-				calculateFeatures(strPOS,article);
+				
+				//Features - "unigramPOS","unigramWord","bigramPOS", "trigramPOS"
+				calculateFeatures(strPOS,article,"unigramPOS");
+				calculateFeatures(strPOS,article,"bigramPOS");
+				calculateFeatures(strPOS,article,"trigramPOS");
+				calculateFeatures(strPOS,article,"unigramWord");
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
+			if((++count % 10) == 0)
+				System.out.println("Articled procesed: "+count);
 		}
-		uniqueFeatures(uniqueFeatureMap);
+		//uniqueFeatures(uniqueFeatureMap);
 		
 	}
 	
@@ -73,15 +82,15 @@ class Tagger
 	}
 
 	
-	private static void calculateFeatures(StringBuilder strPOS, AbstractDB article) {
+	private static void calculateFeatures(StringBuilder strPOS, AbstractDB article, String ngram) {
 		
 			 NGrams feature;
-			 feature = NGramFactory.createFeatureVector(ConfigurationConstants.NGRAM_FEATURES);
-			 File file = NGrams.getFileHandle(ConfigurationConstants.NGRAM_FEATURES,((ArticleDetails)article).getId()+".txt");
+			 feature = NGramFactory.createFeatureVector(ngram);
+			 File file = NGrams.getFileHandle(ngram,((ArticleDetails)article).getId()+".txt");
 			 try
 			 {
 				 if(file != null)
-					 feature.calculateFeatureVector(strPOS,article,file,uniqueFeatureMap);
+					 feature.calculateFeatureVector(strPOS,article,file,null);//uniqueFeatureMap);
 			 }
 			 catch(Exception e)
 			 {

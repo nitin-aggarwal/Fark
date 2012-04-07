@@ -87,7 +87,9 @@ private static TriGram triGram = null;
 				bw.write("\n");
 			}
 			bw.flush();
-			updateUniqueFeatureMap(map,uniqueFeatureMap);
+			
+			if(uniqueFeatureMap != null)
+				updateUniqueFeatureMap(map,uniqueFeatureMap);
 		}
 		catch(IOException e)
 		{
