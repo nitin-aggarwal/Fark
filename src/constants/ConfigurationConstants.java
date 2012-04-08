@@ -30,5 +30,7 @@ public class ConfigurationConstants {
     public static final String UNIQUE_FEATURE_DIRECTORY = "uniqueNGramFeatures";
     
     public static final boolean debugMode = false;
+    
+    public static final String[] FOLDER_NAMES = {"unigramWord"};//, "unigramWord","bigramPOS", "trigramPOS"};
 }
 //"news.yahoo.com", "cnn.com",
