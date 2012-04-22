@@ -192,6 +192,7 @@ public class GenerateWekaInput
         			++count;
         			if(count % 1000 == 0)
         				System.out.println(count);
+        			map.clear();
             	} 
             }
 			catch(Exception e)

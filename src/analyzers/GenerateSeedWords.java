@@ -7,10 +7,11 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.TreeMap;
 
 import services.RetrieveDataSrv;
 import constants.ConfigurationConstants;
@@ -18,24 +19,34 @@ import entities.AbstractDB;
 import entities.ArticleDetails;
 
 
-public class GenerateDistinct 
+public class GenerateSeedWords 
 {
-	static Object dummyObject = new Object();
-	private static HashMap<String,Object> map = new HashMap<String, Object>();
+	Object dummyObject = new Object();
+	private static HashMap<String,Integer> map = new HashMap<String, Integer>();
+	private static TreeMap<String,Integer> distinct = new TreeMap<String, Integer>();
 	
+	private static ValueComparator bvc =  new ValueComparator(distinct);
+	private static TreeMap<String,Integer> distinctSorted = new TreeMap<String, Integer>(bvc);
+
 	
 	public static void compute() throws NumberFormatException, IOException, SQLException, ClassNotFoundException
 	{
 		StringBuilder parentDirectoryPath =  new StringBuilder(System.getProperty("user.dir"));
 		parentDirectoryPath.append(File.separator).append("files"); 
 		
-		// Distinct file
+		// SeedWords file in directory seed
+		String filename = "Amusing1000";
+		
+		// Distinct file in directory uniqueNGramFeatures
 		String unique = "unigramWordA1000";
 		
 		// Folder file
 		String folder = "unigramWord";
-		
 		long records = 1000;
+		
+		File file = new File(parentDirectoryPath +(new StringBuilder()).append(File.separator).append("seed").append(File.separator).append(filename).toString());
+		BufferedWriter bw = null;
+		bw = new BufferedWriter(new FileWriter(file));
 		
 		File uniqueFile = new File(parentDirectoryPath +(new StringBuilder()).append(File.separator).
 				append(ConfigurationConstants.UNIQUE_FEATURE_DIRECTORY).append(File.separator).append(unique).toString());
@@ -51,7 +62,7 @@ public class GenerateDistinct
 				String line;
 				while((line = br.readLine())!= null)
 				{
-					map.put(line,dummyObject);
+					distinct.put(line,0);
 				}
 				br.close();
 			} 
@@ -61,15 +72,6 @@ public class GenerateDistinct
 			e.printStackTrace();
 		}
 		
-		
-		/*
-		 * A - Amusing
-		 * B - Interesting
-		 * C - Cool
-		 * D - Obvious
-		 */
-		
-		
 		//String[] tags = {"amusing","cool","obvious","interesting"};
 		String[] tags = {"amusing"};
 		
@@ -78,11 +80,12 @@ public class GenerateDistinct
 		System.out.println("Size of dataset: "+articleList.size());
 		
 		StringBuilder dir = new StringBuilder(parentDirectoryPath +(new StringBuilder()).append(File.separator).append(folder).toString());
+		long count = 0;
 		long amusingCount = 0;
 		long interestCount = 0;
 		long coolCount = 0;
 		long obviousCount = 0;
-		
+		long totalCount = 0;
 		for(AbstractDB article:articleList)
 		{
 			try 
@@ -93,6 +96,9 @@ public class GenerateDistinct
                 
                 if(articleFile.exists())
                 {
+                	totalCount = amusingCount+interestCount+coolCount+obviousCount;
+                	if(totalCount == 4*records)
+                		break;
                 	if(((ArticleDetails)article).getFarkTag().equalsIgnoreCase("amusing"))
         			{
                 		if(amusingCount < records)
@@ -121,7 +127,7 @@ public class GenerateDistinct
                 		else
                 			continue;
         			}
-        			br = new BufferedReader(new FileReader(articleFile));
+                	br = new BufferedReader(new FileReader(articleFile));
             		String line;
             		while((line = br.readLine())!= null)
             		{
@@ -132,10 +138,23 @@ public class GenerateDistinct
     						feature.append(words[i]+" ");
     					}
     					feature.append(words[words.length-2]);
-    					if(map.get(feature) == null)
-    						map.put(feature.toString(),dummyObject);
+    					map.put(feature.toString(), Integer.parseInt(words[words.length-1]));
             		}
             		br.close();
+            		
+
+        			Integer value;
+        			for(String str: distinct.keySet())
+        			{
+        				value = map.get(str);
+        				if(value != null)
+        					distinct.put(str,distinct.get(str)+1);
+        			}
+        			
+        			++count;
+        			if(count % 1000 == 0)
+        				System.out.println(count);
+        			map.clear();
             	} 
             }
 			catch(Exception e)
@@ -143,27 +162,15 @@ public class GenerateDistinct
 				e.printStackTrace();
 			}
 		}
-		System.out.println("Total records processed: "+(amusingCount+interestCount+coolCount+obviousCount));
-		BufferedWriter bw = new BufferedWriter(new FileWriter(uniqueFile));
-		Set<String> entrySet = map.keySet();
-		Iterator<String> iterator = entrySet.iterator();
-
-		try
+		System.out.println("Total records processed: "+count);
+		distinctSorted.putAll(distinct);
+		for(String str: distinctSorted.keySet())
 		{
-			while(iterator.hasNext())
-			{
-				String feature = iterator.next();
-				bw.write(feature);
-				bw.write("\n");
-			}
-			bw.flush();
-			bw.close();
-			
+			bw.write(str+" "+distinctSorted.get(str));
+			bw.write("\n");
 		}
-		catch(Exception e)
-		{
-			
-		}
+		bw.flush();
+		bw.close();
 	}
 	public static void main(String args[])
 	{
@@ -184,3 +191,21 @@ public class GenerateDistinct
 		}
 	}
 }
+class ValueComparator implements Comparator<Object> {
+
+	  Map<String, Integer> base;
+	  public ValueComparator(Map<String, Integer> base) {
+	      this.base = base;
+	  }
+
+	  public int compare(Object a, Object b) {
+
+	    if(base.get(a) <= base.get(b)) {
+	      return 1;
+	    } else if(base.get(a) == base.get(b)) {
+	      return 0;
+	    } else {
+	      return -1;
+	    }
+	  }
+	}
