@@ -20,23 +20,31 @@ import entities.ArticleDetails;
 public class GenerateWekaInput 
 {
 	Object dummyObject = new Object();
+	
+	/**
+	 * It holds all the word, count pairs for an article at a time
+	 */
 	private static HashMap<String,Integer> map = new HashMap<String, Integer>();
 	
+	/**
+	 * It contains all the features i.e. distinct words or POS tags
+	 */
+	private static LinkedList<String> featureList = new LinkedList<String>();
 	
-	public static void compute() throws NumberFormatException, IOException, SQLException, ClassNotFoundException
+	
+	public static void compute(String dest, String uniq, String srcDir, long rcd, String[] category) throws NumberFormatException, IOException, SQLException, ClassNotFoundException
 	{
 		StringBuilder parentDirectoryPath =  new StringBuilder(System.getProperty("user.dir"));
 		parentDirectoryPath.append(File.separator).append("files"); 
 		
-		// Weka file
-		String filename = "stopWordsC1000.arff";
+		// Weka file created in wekaInput folder
+		String filename = dest;
 		
-		// Distinct file
-		String unique = "stopWords3";
+		// Distinct file from uniqueNGramFeatures folder
+		String unique = uniq;
 		
-		// Folder file
-		String folder = "unigramWord";
-		long records = 1000;
+		String folder = srcDir;
+		long records = rcd;
 		
 		File file = new File(parentDirectoryPath +(new StringBuilder()).append(File.separator).append("wekaInput").append(File.separator).append(filename).toString());
 		BufferedWriter bw = null;
@@ -48,7 +56,6 @@ public class GenerateWekaInput
 		File uniqueFile = new File(parentDirectoryPath +(new StringBuilder()).append(File.separator).
 				append(ConfigurationConstants.UNIQUE_FEATURE_DIRECTORY).append(File.separator).append(unique).toString());
 		
-		LinkedList<String> featureList = new LinkedList<String>();
 		BufferedReader br = null;
 		
 		// Create a linked list for all the distinct features
@@ -63,7 +70,12 @@ public class GenerateWekaInput
 					featureList.add(line);
 				}
 				br.close();
-			} 
+			}
+			else
+			{
+				System.out.println("Distinct file provided does not exist");
+				return;
+			}
 		}
 		catch(Exception e)
 		{
@@ -89,20 +101,25 @@ public class GenerateWekaInput
 		bw.write("@data");
 		bw.write("\n");
 		
+		String[] tags = category;
+		int tagCount = tags.length;
 		
-		String[] tags = {"amusing","cool","obvious","interesting"};
+		System.out.println("Processing data for generating weka file: "+filename);
 		
 		// Retrieve all the records from the database with the required criteria
 		List<AbstractDB> articleList = RetrieveDataSrv.retrieveRecords("ArticleDetails", tags);
 		System.out.println("Size of dataset: "+articleList.size());
 		
 		StringBuilder dir = new StringBuilder(parentDirectoryPath +(new StringBuilder()).append(File.separator).append(folder).toString());
+		
 		long count = 0;
-		long amusingCount = 0;
-		long interestCount = 0;
-		long coolCount = 0;
-		long obviousCount = 0;
 		long totalCount = 0;
+		
+		// Map to keep count of documents processed for each tag
+		HashMap<String,Integer> countTag = new HashMap<String, Integer>();
+		for(String s: tags)
+			countTag.put(s, 0);
+		
 		for(AbstractDB article:articleList)
 		{
 			try 
@@ -113,38 +130,36 @@ public class GenerateWekaInput
                 
                 if(articleFile.exists())
                 {
-                	totalCount = amusingCount+interestCount+coolCount+obviousCount;
-                	if(totalCount == 4*records)
+                	totalCount = 0;
+                	for(String tag: countTag.keySet())
+                		totalCount += countTag.get(tag);
+                	
+                	if(totalCount == tagCount*records)
                 		break;
-                	if(((ArticleDetails)article).getFarkTag().equalsIgnoreCase("amusing"))
+                	
+                	++count;
+        			if(count % 1000 == 0)
+        				System.out.println(count);
+        			
+                	String articleTag = ((ArticleDetails)article).getFarkTag().toLowerCase();
+                	int tempCount = 0;
+                	if(countTag.keySet().contains(articleTag))
         			{
-                		if(amusingCount < records)
-                			amusingCount++;
+                		if(countTag.get(articleTag) < records)
+                		{
+                			tempCount = countTag.get(articleTag);
+                			countTag.remove(articleTag);
+                			countTag.put(articleTag, tempCount + 1);
+                		}
                 		else
                 			continue;
         			}
-        			else if(((ArticleDetails)article).getFarkTag().equalsIgnoreCase("interesting"))
-        			{
-        				if(interestCount < records)
-                			interestCount++;
-                		else
-                			continue;
-        			}
-        			else if(((ArticleDetails)article).getFarkTag().equalsIgnoreCase("cool"))
-        			{
-        				if(coolCount < records)
-                			coolCount++;
-                		else
-                			continue;
-        			}
-        			else if(((ArticleDetails)article).getFarkTag().equalsIgnoreCase("obvious"))
-        			{
-        				if(obviousCount < records)
-                			obviousCount++;
-                		else
-                			continue;
-        			}
+                	else
+                		continue;
+                	
                 	br = new BufferedReader(new FileReader(articleFile));
+                	
+                	// Read the article content in the map
             		String line;
             		while((line = br.readLine())!= null)
             		{
@@ -170,6 +185,7 @@ public class GenerateWekaInput
         				else
         					result.append(value).append(",");
         			}
+        			
         			// 4-way classification
         			if(((ArticleDetails)article).getFarkTag().equalsIgnoreCase("amusing"))
         			{
@@ -189,9 +205,7 @@ public class GenerateWekaInput
         			}
         			bw.write(result.toString());
         			bw.write("\n");
-        			++count;
-        			if(count % 1000 == 0)
-        				System.out.println(count);
+        			
         			map.clear();
             	} 
             }
@@ -201,13 +215,60 @@ public class GenerateWekaInput
 			}
 		}
 		System.out.println("Total records processed: "+count);
+		System.out.println("Total records considered: "+totalCount);
 		bw.flush();
 		bw.close();
+		
+		featureList.clear();
 	}
 	public static void main(String args[])
 	{
 		try {
-			compute();
+
+			// 4-way classification
+			
+			// UNIGRAM Words
+			/*
+			compute("UnigramWord100.arff","UnigramWord100","unigramWord",100,"amusing cool interesting obvious".split(" "));
+			compute("UnigramWord250.arff","UnigramWord250","unigramWord",250,"amusing cool interesting obvious".split(" "));
+			compute("UnigramWord500.arff","UnigramWord500","unigramWord",500,"amusing cool interesting obvious".split(" "));
+			compute("UnigramWord1000.arff","UnigramWord1000","unigramWord",1000,"amusing cool interesting obvious".split(" "));
+			*/
+			
+			// UNIGRAM POS
+			compute("UnigramPOS500.arff","UnigramPOS500","unigramPOS",500,"amusing cool interesting obvious".split(" "));
+			compute("UnigramPOS2000.arff","UnigramPOS2000","unigramPOS",2000,"amusing cool interesting obvious".split(" "));
+			compute("UnigramPOS5000.arff","UnigramPOS5000","unigramPOS",5000,"amusing cool interesting obvious".split(" "));
+			compute("UnigramPOS10000.arff","UnigramPOS10000","unigramPOS",10000,"amusing cool interesting obvious".split(" "));
+			
+			// BIGRAM POS
+			compute("BigramPOS500.arff","BigramPOS500","bigramPOS",500,"amusing cool interesting obvious".split(" "));
+			compute("BigramPOS1000.arff","BigramPOS1000","bigramPOS",1000,"amusing cool interesting obvious".split(" "));
+			compute("BigramPOS2500.arff","BigramPOS2500","bigramPOS",2500,"amusing cool interesting obvious".split(" "));
+			compute("BigramPOS6000.arff","BigramPOS6000","bigramPOS",6000,"amusing cool interesting obvious".split(" "));
+			
+			// TRIGRAM POS
+			compute("TrigramPOS100.arff","TrigramPOS100","trigramPOS",100,"amusing cool interesting obvious".split(" "));
+			compute("TrigramPOS250.arff","TrigramPOS250","trigramPOS",250,"amusing cool interesting obvious".split(" "));
+			compute("TrigramPOS400.arff","TrigramPOS400","trigramPOS",400,"amusing cool interesting obvious".split(" "));
+			compute("TrigramPOS500.arff","TrigramPOS500","trigramPOS",500,"amusing cool interesting obvious".split(" "));
+			
+			// STOP Words (174)
+			compute("StopWordA1000.arff","stopWords1","unigramWord",1000,"amusing cool interesting obvious".split(" "));
+			compute("StopWordA2000.arff","stopWords1","unigramWord",2000,"amusing cool interesting obvious".split(" "));
+			compute("StopWordA6000.arff","stopWords1","unigramWord",6000,"amusing cool interesting obvious".split(" "));
+			
+			// STOP Words (543)
+			compute("StopWordB1000.arff","stopWords2","unigramWord",1000,"amusing cool interesting obvious".split(" "));
+			compute("StopWordB2000.arff","stopWords2","unigramWord",2000,"amusing cool interesting obvious".split(" "));
+			compute("StopWordB6000.arff","stopWords2","unigramWord",6000,"amusing cool interesting obvious".split(" "));
+			
+			// STOP Words (667)
+			compute("StopWordC1000.arff","stopWords3","unigramWord",1000,"amusing cool interesting obvious".split(" "));
+			compute("StopWordC2000.arff","stopWords3","unigramWord",2000,"amusing cool interesting obvious".split(" "));
+			compute("StopWordC6000.arff","stopWords3","unigramWord",6000,"amusing cool interesting obvious".split(" "));
+			
+			
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

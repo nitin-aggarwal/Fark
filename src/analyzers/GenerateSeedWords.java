@@ -10,70 +10,65 @@ import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
 import services.RetrieveDataSrv;
-import constants.ConfigurationConstants;
 import entities.AbstractDB;
 import entities.ArticleDetails;
+import generics.StopWords;
 
 
 public class GenerateSeedWords 
 {
-	Object dummyObject = new Object();
+	Object dummyObject = new Object(); 
+	
+	/**
+	 * It holds all the word, count pairs for an article at a time
+	 */
 	private static HashMap<String,Integer> map = new HashMap<String, Integer>();
+	
+	/**
+	 * It holds all the distinct word, count pairs from the distinct file
+	 */
 	private static TreeMap<String,Integer> distinct = new TreeMap<String, Integer>();
 	
+	// Comparator extended to get the sorted list
 	private static ValueComparator bvc =  new ValueComparator(distinct);
 	private static TreeMap<String,Integer> distinctSorted = new TreeMap<String, Integer>(bvc);
 
-	
-	public static void compute() throws NumberFormatException, IOException, SQLException, ClassNotFoundException
+	/**
+	 * 
+	 * @param dest - refers to the name of the file to be created in the seed folder
+	 * @param sourceDir - refers to the feature directory, which contain files for individual articles
+	 * @param rcd - refers to number of articles to be processed for each category
+	 * @param category - string array of the fark tags to be processed
+	 * 
+	 * @throws NumberFormatException
+	 * @throws IOException
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 */
+	public static void compute(String dest, String srcDir, long rcd, String[] category) throws NumberFormatException, IOException, SQLException, ClassNotFoundException
 	{
 		StringBuilder parentDirectoryPath =  new StringBuilder(System.getProperty("user.dir"));
 		parentDirectoryPath.append(File.separator).append("files"); 
 		
 		// SeedWords file in directory seed
-		String filename = "Amusing1000";
-		
-		// Distinct file in directory uniqueNGramFeatures
-		String unique = "unigramWordA1000";
+		String filename = dest;
 		
 		// Folder file
-		String folder = "unigramWord";
-		long records = 1000;
+		String folder = srcDir;
+		long records = rcd;
 		
 		File file = new File(parentDirectoryPath +(new StringBuilder()).append(File.separator).append("seed").append(File.separator).append(filename).toString());
+		BufferedReader br = null;
 		BufferedWriter bw = null;
 		bw = new BufferedWriter(new FileWriter(file));
 		
-		File uniqueFile = new File(parentDirectoryPath +(new StringBuilder()).append(File.separator).
-				append(ConfigurationConstants.UNIQUE_FEATURE_DIRECTORY).append(File.separator).append(unique).toString());
+		String[] tags = category;
+		int tagCount = tags.length;
 		
-		BufferedReader br = null;
-		
-		// Create a linked list for all the distinct features
-		try
-		{
-			if(uniqueFile.exists())
-			{
-				br = new BufferedReader(new FileReader(uniqueFile));
-				String line;
-				while((line = br.readLine())!= null)
-				{
-					distinct.put(line,0);
-				}
-				br.close();
-			} 
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		
-		//String[] tags = {"amusing","cool","obvious","interesting"};
-		String[] tags = {"amusing"};
+		System.out.println("Processing data for "+filename);
 		
 		// Retrieve all the records from the database with the required criteria
 		List<AbstractDB> articleList = RetrieveDataSrv.retrieveRecords("ArticleDetails", tags);
@@ -81,53 +76,50 @@ public class GenerateSeedWords
 		
 		StringBuilder dir = new StringBuilder(parentDirectoryPath +(new StringBuilder()).append(File.separator).append(folder).toString());
 		long count = 0;
-		long amusingCount = 0;
-		long interestCount = 0;
-		long coolCount = 0;
-		long obviousCount = 0;
+		
+		// Map to keep count of documents processed for each tag
+		HashMap<String,Integer> countTag = new HashMap<String, Integer>();
+		for(String s: tags)
+			countTag.put(s, 0);
+		
 		long totalCount = 0;
 		for(AbstractDB article:articleList)
 		{
 			try 
 			{
 				String id = ""+((ArticleDetails)article).getId();
-				//System.out.println("ArticleId: "+id);
-                File articleFile = new File(dir+new StringBuilder().append(File.separator).append(id).append(".txt").toString());
+				File articleFile = new File(dir+new StringBuilder().append(File.separator).append(id).append(".txt").toString());
                 
                 if(articleFile.exists())
                 {
-                	totalCount = amusingCount+interestCount+coolCount+obviousCount;
-                	if(totalCount == 4*records)
+                	totalCount = 0;
+                	for(String tag: countTag.keySet())
+                		totalCount += countTag.get(tag);
+                	
+                	if(totalCount == tagCount*records)
                 		break;
-                	if(((ArticleDetails)article).getFarkTag().equalsIgnoreCase("amusing"))
+                	
+                	++count;
+        			if(count % 1000 == 0)
+        				System.out.println(count);
+        			
+                	String articleTag = ((ArticleDetails)article).getFarkTag().toLowerCase();
+                	int tempCount = 0;
+                	if(countTag.keySet().contains(articleTag))
         			{
-                		if(amusingCount < records)
-                			amusingCount++;
+                		if(countTag.get(articleTag) < records)
+                		{
+                			tempCount = countTag.get(articleTag);
+                			countTag.remove(articleTag);
+                			countTag.put(articleTag, tempCount + 1);
+                		}
                 		else
                 			continue;
         			}
-        			else if(((ArticleDetails)article).getFarkTag().equalsIgnoreCase("interesting"))
-        			{
-        				if(interestCount < records)
-                			interestCount++;
-                		else
-                			continue;
-        			}
-        			else if(((ArticleDetails)article).getFarkTag().equalsIgnoreCase("cool"))
-        			{
-        				if(coolCount < records)
-                			coolCount++;
-                		else
-                			continue;
-        			}
-        			else if(((ArticleDetails)article).getFarkTag().equalsIgnoreCase("obvious"))
-        			{
-        				if(obviousCount < records)
-                			obviousCount++;
-                		else
-                			continue;
-        			}
-                	br = new BufferedReader(new FileReader(articleFile));
+                	else
+                		continue;
+                	
+        			br = new BufferedReader(new FileReader(articleFile));
             		String line;
             		while((line = br.readLine())!= null)
             		{
@@ -144,16 +136,15 @@ public class GenerateSeedWords
             		
 
         			Integer value;
-        			for(String str: distinct.keySet())
+        			for(String str: map.keySet())
         			{
-        				value = map.get(str);
+        				value = distinct.get(str);
         				if(value != null)
-        					distinct.put(str,distinct.get(str)+1);
+        					distinct.put(str,value+1);
+        				else
+        					distinct.put(str,1);
         			}
         			
-        			++count;
-        			if(count % 1000 == 0)
-        				System.out.println(count);
         			map.clear();
             	} 
             }
@@ -163,19 +154,43 @@ public class GenerateSeedWords
 			}
 		}
 		System.out.println("Total records processed: "+count);
+		System.out.println("Total records considered: "+totalCount);
 		distinctSorted.putAll(distinct);
 		for(String str: distinctSorted.keySet())
 		{
-			bw.write(str+" "+distinctSorted.get(str));
-			bw.write("\n");
+			// Excluding all the words containing special characters and numbers
+			if(!str.matches(".*[0-9].*") && !str.matches(".*[\\W].*"))
+			{
+				boolean flag = false;
+				// Excluding all the stop words
+				for(String sw: StopWords.stopWords){
+					if(str.compareTo(sw)==0){
+						flag = true;
+						break;
+					}
+				}
+				
+				// Writing to file all the seed words
+				if(distinct.get(str) > 10 && !flag){
+					bw.write(str+" "+distinct.get(str));
+					bw.write("\n");
+				}
+			}
 		}
 		bw.flush();
 		bw.close();
+		
+		map.clear();
+		distinct.clear();
+		distinctSorted.clear();
 	}
 	public static void main(String args[])
 	{
 		try {
-			compute();
+			compute("Amusing4000","unigramWord",4000,"amusing".split(" "));
+			compute("Cool4000","unigramWord",4000,"cool".split(" "));
+			compute("Obvious4000","unigramWord",4000,"obvious".split(" "));
+			compute("Interesting4000","unigramWord",4000,"interesting".split(" "));
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -193,8 +208,8 @@ public class GenerateSeedWords
 }
 class ValueComparator implements Comparator<Object> {
 
-	  Map<String, Integer> base;
-	  public ValueComparator(Map<String, Integer> base) {
+	  TreeMap<String, Integer> base;
+	  public ValueComparator(TreeMap<String, Integer> base) {
 	      this.base = base;
 	  }
 
