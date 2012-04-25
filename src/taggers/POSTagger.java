@@ -46,7 +46,6 @@ public class POSTagger {
 		strPOS.setLength(strPOS.length()-1);
 		if(ConfigurationConstants.debugMode)	{
 			System.out.println("POS tagging completed");
-			System.out.println("POS file writing started");
 		}
 		
 		return strPOS;

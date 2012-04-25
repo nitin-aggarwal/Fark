@@ -1,4 +1,5 @@
 package analyzers;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -80,6 +81,7 @@ public class Crawler {
 
 	/**
 	 * decides whether there is another URL to process or not
+	 * 
 	 * @return
 	 */
 	private static boolean hasNextURL() {
@@ -97,7 +99,8 @@ public class Crawler {
 	}
 
 	/**
-	 * Computes the next URL 
+	 * Computes the next URL
+	 * 
 	 * @return
 	 */
 	private static StringBuilder nextURL() {
@@ -237,16 +240,11 @@ public class Crawler {
 		}
 
 		if (ConfigurationConstants.ARTICLE_CONTENT_INSERTION) {
-			// if(ConfigurationConstants.SITE_TYPE.compareTo("site") == 0)
-			// {
-			// for(String site : ConfigurationConstants.sites)
-			// crawler.insertArticleContentFromSite(site);
-			// }
-			//
-			if (ConfigurationConstants.SITE_TYPE.compareTo("all") == 0) {
-				crawler.insertArticleContentbyTag("interesting");// obvious,
-																	// strange,interesting
-				// crawler.insertArticleContentFromSiteAndTag("cnn.com","sad");
+			if (ConfigurationConstants.SITE_TYPE.compareTo("siteTag") == 0) {
+				for (String site : ConfigurationConstants.sites)
+					crawler.insertArticleContentFromSiteAndTag(site, "amusing");
+			} else if (ConfigurationConstants.SITE_TYPE.compareTo("all") == 0) {
+				crawler.insertArticleContentbyTag("interesting");
 			}
 		}
 		InsertDataSrv.close();
@@ -293,18 +291,10 @@ public class Crawler {
 
 	}
 
-	private String getParsedURL(String articleURL) {
-
-		String URL = articleURL.substring(articleURL.indexOf("l=") + 2);
-		String finalURL[] = URL.split("%");
-		return finalURL[0];
-	}
-
-	@SuppressWarnings("unused")
 	private void insertArticleContentFromSiteAndTag(String site, String tag) {
 
 		List<AbstractDB> articleDetailList = null;
-		//RetrieveDataSrv.beginTransaction();
+		// RetrieveDataSrv.beginTransaction();
 		articleDetailList = RetrieveDataSrv.retrieveRecords("ArticleDetails",
 				site, tag);
 		long count = 1;
@@ -347,4 +337,12 @@ public class Crawler {
 		}
 		InsertDataSrv.commit();
 	}
+	
+	private String getParsedURL(String articleURL) {
+
+		String URL = articleURL.substring(articleURL.indexOf("l=") + 2);
+		String finalURL[] = URL.split("%");
+		return finalURL[0];
+	}
+
 }
