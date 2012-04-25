@@ -11,8 +11,6 @@ import java.util.Set;
 
 import constants.ConfigurationConstants;
 
-import entities.AbstractDB;
- 
 /*
  * This class is for features computation related to
  * Uni-gram POS
@@ -20,77 +18,61 @@ import entities.AbstractDB;
 public class UniGram extends NGrams {
 
 	private static UniGram uniGram = null;
-	
-	private UniGram()
-	{
-		
+
+	private UniGram() {
 	}
-	
-	public static UniGram getInstance()
-	{
-		if(uniGram == null)
+
+	public static UniGram getInstance() {
+		if (uniGram == null)
 			uniGram = new UniGram();
 		return uniGram;
 	}
 
-	public void calculateFeatureVector(StringBuilder strPOS, AbstractDB article , File file, HashMap<String,Object> uniqueFeatureMap) throws IOException {
-		
-		// write code here for unigram calculation.
-		// the following regular expression is working,,,
-		// just count for 
-		HashMap<String,Integer> map = new HashMap<String,Integer>();
+	/**
+	 * Compute UNIGRAM POS features for an POS tagged article content strPOS, 
+	 * and create a file in folder unigramPOS
+	 */
+	public void calculateFeatureVector(StringBuilder strPOS, File file) throws IOException {
+
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
 		Integer count;
 		String temp = strPOS.toString().trim();
 		BufferedWriter bw = null;
-		try
-		{
+		try {
 			bw = new BufferedWriter(new FileWriter(file));
-		
-			if(ConfigurationConstants.debugMode)
+
+			if (ConfigurationConstants.debugMode)
 				System.out.println(strPOS);
 			String[] spacesSplitter = temp.split("\\s");
-		
-			for(String spaceSeperated: spacesSplitter)
-			{
+
+			for (String spaceSeperated : spacesSplitter) {
 				String[] splitter = spaceSeperated.split("/");
-				if(splitter.length == 2)
-				{
+				if (splitter.length == 2) {
 					String tag = splitter[1].toUpperCase();
-					if((count = map.get(tag)) != null) 
+					if ((count = map.get(tag)) != null)
 						map.put(tag, ++count);
 					else
 						map.put(tag, 1);
 				}
 			}
-		
-			Set<Entry<String,Integer>> entrySet = map.entrySet();
-			Iterator<Entry<String,Integer>> iterator = entrySet.iterator();
-	
-			while(iterator.hasNext())
-			{
+
+			Set<Entry<String, Integer>> entrySet = map.entrySet();
+			Iterator<Entry<String, Integer>> iterator = entrySet.iterator();
+
+			while (iterator.hasNext()) {
 				Entry<String, Integer> entry = iterator.next();
-				if(ConfigurationConstants.debugMode)
-					System.out.println(entry.getKey()+" "+entry.getValue());
-				
-				bw.write(entry.getKey()+" "+entry.getValue());
+				if (ConfigurationConstants.debugMode)
+					System.out.println(entry.getKey() + " " + entry.getValue());
+
+				bw.write(entry.getKey() + " " + entry.getValue());
 				bw.write("\n");
 			}
 			bw.flush();
-			
-			if(uniqueFeatureMap != null)
-				updateUniqueFeatureMap(map,uniqueFeatureMap);
-		}	
-		catch(IOException e)
-		{
+		} catch (IOException e) {
 			System.out.println("Exception Inside Unigram Feature Computation");
 			e.printStackTrace();
-		}
-		finally
-		{
+		} finally {
 			bw.close();
 		}
 	}
-	
-	
-	
 }

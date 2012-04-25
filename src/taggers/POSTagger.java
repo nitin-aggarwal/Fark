@@ -1,8 +1,5 @@
 package taggers;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import constants.ConfigurationConstants;
@@ -10,7 +7,7 @@ import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import entities.AbstractDB;
 import entities.ArticleDetails;
 
-public class POSTagger extends Tagger {
+public class POSTagger {
 
 	MaxentTagger tagger;
 	
@@ -18,6 +15,14 @@ public class POSTagger extends Tagger {
 	{
 		tagger = new MaxentTagger("taggers/bidirectional-distsim-wsj-0-18.tagger");
 	}
+	
+	/**
+	 * Compute the POS tagged string for the article content
+	 * @param article
+	 * @return POS tagged string
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	public StringBuilder tagArticles(AbstractDB article) throws IOException, ClassNotFoundException
 	{
 		StringBuilder strPOS = new StringBuilder();

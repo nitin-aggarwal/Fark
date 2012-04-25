@@ -11,78 +11,69 @@ import java.util.Set;
 
 import constants.ConfigurationConstants;
 
-import entities.AbstractDB;
-
 /*
  * This class is for features computation related to
  * Uni-gram Words
  */
-public class UniGramWord extends NGrams{
-	
-private static UniGramWord uniGramWord = null;
-	
-	private UniGramWord()
-	{
-		
+public class UniGramWord extends NGrams {
+
+	private static UniGramWord uniGramWord = null;
+
+	private UniGramWord() {
 	}
-	
-	public void calculateFeatureVector(StringBuilder strPOS, AbstractDB article , File file,HashMap<String,Object> uniqueFeatureMap) throws IOException {
-		
+
+	/**
+	 * Compute UNIGRAM word features for an POS tagged article content strPOS,
+	 * and create a file in folder unigramWord
+	 */
+	public void calculateFeatureVector(StringBuilder strPOS, File file)
+			throws IOException {
+
 		// write code for calculating unigram words here..
-		HashMap<String,Integer> map = new HashMap<String,Integer>();
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
 		Integer count;
-		
+
 		String temp = strPOS.toString().trim();
 		String[] spacesSplitter = temp.split("\\s");
 		BufferedWriter bw = null;
-		try
-		{
+		try {
 			bw = new BufferedWriter(new FileWriter(file));
-		
-			for(String spaceSeperated: spacesSplitter)
-			{
+
+			for (String spaceSeperated : spacesSplitter) {
 				String[] splitter = spaceSeperated.split("/");
-				if(splitter.length == 2)
-				{
+				if (splitter.length == 2) {
 					String word = splitter[0].toLowerCase();
-					if((count = map.get(word)) != null) 
+					if ((count = map.get(word)) != null)
 						map.put(word, ++count);
 					else
 						map.put(word, 1);
 				}
 			}
-		
-			Set<Entry<String,Integer>> entrySet = map.entrySet();
-			Iterator<Entry<String,Integer>> iterator = entrySet.iterator();
-	
-			while(iterator.hasNext())
-			{
+
+			Set<Entry<String, Integer>> entrySet = map.entrySet();
+			Iterator<Entry<String, Integer>> iterator = entrySet.iterator();
+
+			while (iterator.hasNext()) {
 				Entry<String, Integer> entry = iterator.next();
-				if(ConfigurationConstants.debugMode)
-					System.out.println(entry.getKey()+": "+entry.getValue());
-				
-				bw.write(entry.getKey()+" "+entry.getValue());
+				if (ConfigurationConstants.debugMode)
+					System.out
+							.println(entry.getKey() + ": " + entry.getValue());
+
+				bw.write(entry.getKey() + " " + entry.getValue());
 				bw.write("\n");
 			}
 			bw.flush();
-			
-			if(uniqueFeatureMap != null)
-				updateUniqueFeatureMap(map,uniqueFeatureMap);
-		}
-		catch(IOException e)
-		{
-			System.out.println("Exception Inside UnigramWord Feature Computation");
+		} catch (IOException e) {
+			System.out
+					.println("Exception Inside UnigramWord Feature Computation");
 			e.printStackTrace();
-		}
-		finally
-		{
+		} finally {
 			bw.close();
 		}
 	}
-	
-	public static UniGramWord getInstance()
-	{
-		if(uniGramWord == null)
+
+	public static UniGramWord getInstance() {
+		if (uniGramWord == null)
 			uniGramWord = new UniGramWord();
 		return uniGramWord;
 	}
