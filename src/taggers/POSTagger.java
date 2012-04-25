@@ -39,6 +39,9 @@ public class POSTagger {
 			
 			System.out.println("Sentences: "+articleContent.length());
 		}
+		
+		// Sentences are split on the basis of '.'
+		// So each line in a file would represent one sentence
 		String temp[] = articleContent.split("\\.");
 		for(String sentence: temp)
 			strPOS.append(tagger.tagString(sentence) +"\n");
