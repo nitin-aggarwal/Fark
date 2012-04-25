@@ -1,14 +1,15 @@
 package factory;
 
+import features.Feature;
+import features.ParserPCFG;
 import features.ngrams.BiGram;
-import features.ngrams.NGrams;
 import features.ngrams.TriGram;
 import features.ngrams.UniGram;
 import features.ngrams.UniGramWord;
 
-public class NGramFactory {
+public class FeatureFactory {
 
-	public static NGrams createFeatureVector(String feature)
+	public static Feature createFeatureVector(String feature)
 	{
 		if(feature.equals("unigramPOS"))
 			return UniGram.getInstance();
@@ -18,6 +19,8 @@ public class NGramFactory {
 			return BiGram.getInstance();
 		else if(feature.equals("trigramPOS"))
 			return TriGram.getInstance();
+		else if(feature.equals("parser"))
+			return ParserPCFG.getInstance();
 		else
 			return null;
 	}

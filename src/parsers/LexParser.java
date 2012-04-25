@@ -26,10 +26,7 @@ public class LexParser {
 	public List<Tree> parseArticle(AbstractDB article) {
 		// TODO Auto-generated method stub
 
-		
-		System.out.println("Parse start");
-		if(ConfigurationConstants.debugMode)
-			System.out.println("Parsing started");
+		System.out.println("Parsing started");
 		
 		String articleContent = ((ArticleDetails)article).getArticleContent();
 		
@@ -38,8 +35,6 @@ public class LexParser {
 			System.out.println("Available Memory: "+Runtime.getRuntime().freeMemory());
 			System.out.println("Total Memory: "+Runtime.getRuntime().totalMemory());
 			System.out.println("Max memory: "+Runtime.getRuntime().maxMemory());
-			
-			System.out.println("Sentences: "+articleContent.length());
 		}
 		
 		List<Tree> parse = new ArrayList<Tree>();
@@ -49,6 +44,10 @@ public class LexParser {
 		for (List<HasWord> sentence : dp) {
 			parse.add(lp.apply(sentence));
 		}
+		
+		if(ConfigurationConstants.debugMode)
+			System.out.println("Parse terminates");
+		
 		return parse;
 	}
 

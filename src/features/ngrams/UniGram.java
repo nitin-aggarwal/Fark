@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import constants.ConfigurationConstants;
+import entities.AbstractDB;
 
 /*
  * This class is for features computation related to
@@ -32,7 +33,7 @@ public class UniGram extends NGrams {
 	 * Compute UNIGRAM POS features for an POS tagged article content strPOS, 
 	 * and create a file in folder unigramPOS
 	 */
-	public void calculateFeatureVector(StringBuilder strPOS, File file) throws IOException {
+	public void calculateFeatureVector(AbstractDB object, StringBuilder strPOS, File file) throws IOException {
 
 		HashMap<String, Integer> map = new HashMap<String, Integer>();
 		Integer count;

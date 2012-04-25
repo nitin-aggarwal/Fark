@@ -7,9 +7,6 @@ import features.Feature;
 
 abstract public class NGrams extends Feature {
 
-	
-	abstract public void calculateFeatureVector(StringBuilder strPOS, File file) throws IOException;
-	
 	Object dummyObject = new Object();
 	public static File getFileHandle(String featureDirectory, String fileName)
 	{

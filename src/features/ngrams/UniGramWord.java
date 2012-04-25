@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import constants.ConfigurationConstants;
+import entities.AbstractDB;
 
 /*
  * This class is for features computation related to
@@ -26,7 +27,7 @@ public class UniGramWord extends NGrams {
 	 * Compute UNIGRAM word features for an POS tagged article content strPOS,
 	 * and create a file in folder unigramWord
 	 */
-	public void calculateFeatureVector(StringBuilder strPOS, File file)
+	public void calculateFeatureVector(AbstractDB object, StringBuilder strPOS, File file)
 			throws IOException {
 
 		// write code for calculating unigram words here..

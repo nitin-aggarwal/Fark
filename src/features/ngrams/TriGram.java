@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import constants.ConfigurationConstants;
+import entities.AbstractDB;
 
 /*
  * This class is for features computation related to
@@ -33,7 +34,7 @@ public class TriGram extends NGrams {
 	 * create a file in folder trigramPOS
 	 */
 	@Override
-	public void calculateFeatureVector(StringBuilder strPOS, File file)
+	public void calculateFeatureVector(AbstractDB object, StringBuilder strPOS, File file)
 			throws IOException {
 
 		HashMap<String, Integer> map = new HashMap<String, Integer>();

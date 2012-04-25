@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import constants.ConfigurationConstants;
+import entities.AbstractDB;
 
 /*
  * This class is for features computation related to
@@ -33,7 +34,7 @@ public class BiGram extends NGrams {
 	 * create a file in folder bigramPOS
 	 */
 	@Override
-	public void calculateFeatureVector(StringBuilder strPOS, File file)
+	public void calculateFeatureVector(AbstractDB object, StringBuilder strPOS, File file)
 			throws IOException {
 		// TODO Auto-generated method stub
 

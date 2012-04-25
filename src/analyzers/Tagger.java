@@ -5,12 +5,13 @@ import java.io.IOException;
 import java.util.List;
 
 import services.RetrieveDataSrv;
+import taggers.POSTagger;
 import constants.ConfigurationConstants;
 import entities.AbstractDB;
 import entities.ArticleDetails;
-import factory.NGramFactory;
+import factory.FeatureFactory;
+import features.Feature;
 import features.ngrams.NGrams;
-import taggers.POSTagger;
 
 class Tagger {
 	
@@ -54,13 +55,13 @@ class Tagger {
 	private static void calculateFeatures(StringBuilder strPOS,
 			AbstractDB article, String ngram) {
 
-		NGrams feature;
-		feature = NGramFactory.createFeatureVector(ngram);
+		Feature feature;
+		feature = FeatureFactory.createFeatureVector(ngram);
 		File file = NGrams.getFileHandle(ngram,
 				((ArticleDetails) article).getId() + ".txt");
 		try {
 			if (file != null)
-				feature.calculateFeatureVector(strPOS, file);
+				feature.calculateFeatureVector(null,strPOS, file);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
