@@ -100,7 +100,7 @@ public class SentenceCohesion extends Feature{
 			return false;
 		}
 		// Nouns and pronouns
-		posNPCohesion = sentPOSCohesion("NN NNS NNP NNPS PP PPS".split(" "));
+		posNPCohesion = sentPOSCohesion("NN NNS NNP NNPS PRP PRP$".split(" "));
 		// Adjectives
 		posADJCohesion = sentPOSCohesion("JJ JJR JJS".split(" "));
 		// Adverbs

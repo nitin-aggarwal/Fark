@@ -1,6 +1,8 @@
 package taggers;
 
 import java.io.IOException;
+import java.text.BreakIterator;
+import java.util.Locale;
 
 import constants.ConfigurationConstants;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
@@ -36,15 +38,16 @@ public class POSTagger {
 			System.out.println("Available Memory: "+Runtime.getRuntime().freeMemory());
 			System.out.println("Total Memory: "+Runtime.getRuntime().totalMemory());
 			System.out.println("Max memory: "+Runtime.getRuntime().maxMemory());
-			
-			System.out.println("Sentences: "+articleContent.length());
 		}
 		
-		// Sentences are split on the basis of '.'
+		// Sentences are split using BreakIterator instead on the basis of '.'
 		// So each line in a file would represent one sentence
-		String temp[] = articleContent.split("\\.");
-		for(String sentence: temp)
-			strPOS.append(tagger.tagString(sentence) +"\n");
+		BreakIterator boundary = BreakIterator.getSentenceInstance(Locale.US);
+        boundary.setText(articleContent);
+        int start = boundary.first();
+	     for (int end = boundary.next();end != BreakIterator.DONE;start = end, end = boundary.next()) {
+	    	 strPOS.append(tagger.tagString(articleContent.substring(start,end)) +"\n");
+	     }	
 					
 		strPOS.setLength(strPOS.length()-1);
 		if(ConfigurationConstants.debugMode)	{
