@@ -1,7 +1,6 @@
 package features.ngrams;
 
 import java.io.File;
-import java.io.IOException;
 
 import features.Feature;
 

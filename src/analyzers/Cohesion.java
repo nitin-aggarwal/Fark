@@ -9,14 +9,14 @@ import entities.ArticleDetails;
 import factory.FeatureFactory;
 import features.Feature;
 
-class Parser {
+class Cohesion {
 
 	
 	/**
 	 * Fetch articles from database and then parse the article content using
 	 * Stanford Parser and compute semantic features
 	 */
-	public static void parseArticles() {
+	public static void cohesionArticles() {
 		
 		String[] tags = { "amusing", "cool", "obvious", "interesting" };
 		
@@ -25,8 +25,8 @@ class Parser {
 		System.out.println("Size of article dataset: " + articleList.size());
 
 		// Fetch all the articles for which parsing has been done
-		List<Integer> articleIds = RetrieveDataSrv.retrieveAttr("ParseDetails", "id");
-		System.out.println("Size of parse dataset: " + articleIds.size());
+		List<Integer> articleIds = RetrieveDataSrv.retrieveAttr("CohesionDetails", "id");
+		System.out.println("Size of coherent dataset: " + articleIds.size());
 		
 		for (AbstractDB article : articleList) {
 			
@@ -34,7 +34,7 @@ class Parser {
 			int articleId = ((ArticleDetails) article).getId();
 			System.out.println("Processing article: "+articleId);
 
-			// If the article has already been parsed, we skip the parsing
+			// If the article coherence has already been computed, we skip the computation
 			for(Integer parseId : articleIds)	{
 				if(articleId == parseId)	{
 					flag = true;
@@ -43,7 +43,7 @@ class Parser {
 			}
 			if(flag)
 				continue;
-			calculateFeatures(article, "parser");
+			calculateFeatures(article, "coherence");
 		}
 	}
 	
@@ -60,6 +60,6 @@ class Parser {
 	}
 
 	public static void main(String args[]) {
-		parseArticles();
+		cohesionArticles();
 	}
 }

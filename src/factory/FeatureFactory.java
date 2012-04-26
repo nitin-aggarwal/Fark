@@ -2,6 +2,7 @@ package factory;
 
 import features.Feature;
 import features.ParserPCFG;
+import features.SentenceCohesion;
 import features.ngrams.BiGram;
 import features.ngrams.TriGram;
 import features.ngrams.UniGram;
@@ -21,6 +22,8 @@ public class FeatureFactory {
 			return TriGram.getInstance();
 		else if(feature.equals("parser"))
 			return ParserPCFG.getInstance();
+		else if(feature.equals("coherence"))
+			return SentenceCohesion.getInstance();
 		else
 			return null;
 	}
