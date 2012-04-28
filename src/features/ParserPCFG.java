@@ -21,8 +21,6 @@ public class ParserPCFG extends Feature	{
 	private static LexParser parser;
 	private static ParseDetails pd;
 	
-	// Processing parsing features on the basis of maximum 100 sentences
-	static long sentencesLimit = 100;
 	
 	// Parse Tree Attributes
 	static double countNP = 0; 		// Noun
@@ -102,9 +100,6 @@ public class ParserPCFG extends Feature	{
 
 		for(Tree parse: parseTree)	{
 		
-			if(sentences >= sentencesLimit)
-				break;
-			
 			depth += parse.depth();
 			score += parse.score();
 			size += parse.size();

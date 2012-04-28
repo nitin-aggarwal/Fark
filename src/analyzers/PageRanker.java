@@ -10,16 +10,16 @@ import entities.ArticleDetails;
 import factory.FeatureFactory;
 import features.Feature;
 
-class Parser {
+class PageRanker {
 
 	
 	/**
-	 * Fetch articles from database and then parse the article content using
-	 * Stanford Parser and compute semantic features
+	 * Fetch articles from database and then compute keywords using
+	 * PageRank Algorithm
 	 */
-	public static void parseArticles() {
+	public static void pageRankArticles() {
 		
-		String[] tags = { "amusing", "cool", "obvious", "interesting" };
+		String[] tags = { "amusing" , "cool", "obvious", "interesting" };
 		
 		// Map to keep count of documents processed for each tag
 		HashMap<String,Integer> countTag = new HashMap<String, Integer>();
@@ -29,19 +29,14 @@ class Parser {
 		long totalCount = 0;
 		long count = 0;
 		int tagCount = tags.length;
-		long records = 500;
+		long records = 5000;
 
 		// Fetch all the articles from the ArticleDetails table, for the above specified tags
 		List<AbstractDB> articleList = RetrieveDataSrv.retrieveRecords("ArticleDetails", tags);
 		System.out.println("Size of article dataset: " + articleList.size());
 
-		// Fetch all the articles for which parsing has been done
-		List<Integer> articleIds = RetrieveDataSrv.retrieveAttr("ParseDetails", "id");
-		System.out.println("Size of parse dataset: " + articleIds.size());
-		
 		for (AbstractDB article : articleList) {
 			
-			boolean flag = false;
 			int articleId = ((ArticleDetails) article).getId();
 			System.out.println("Processing article: "+articleId);
 			
@@ -55,7 +50,7 @@ class Parser {
         	
         	// count refers to articles processed (includes the one not parsed)
         	++count;
-			if(totalCount % 10 == 0)	{
+			if(totalCount % 100 == 0)	{
 				System.out.println("Processed: "+count);
 				for(String str: countTag.keySet())
 					System.out.println(str +" : "+countTag.get(str));
@@ -77,16 +72,7 @@ class Parser {
         	else
         		continue;
 
-			// If the article has already been parsed, we skip the parsing
-			for(Integer parseId : articleIds)	{
-				if(articleId == parseId)	{
-					flag = true;
-					break;
-				}
-			}
-			if(flag)
-				continue;
-			calculateFeatures(article, "parser");
+			calculateFeatures(article, "pageRank");
 		}
 	}
 	
@@ -103,6 +89,9 @@ class Parser {
 	}
 
 	public static void main(String args[]) {
-		parseArticles();
+		pageRankArticles();
+		Feature feature;
+		feature = FeatureFactory.createFeatureVector("pageRank");
+		feature.print();
 	}
 }

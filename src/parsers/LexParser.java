@@ -16,7 +16,10 @@ import entities.ArticleDetails;
 public class LexParser {
 
 	LexicalizedParser lp;
-	int limit = 1000;
+	
+	// Processing parsing features on the basis of maximum 100 sentences
+	static long sentencesLimit = 100;
+	static int sentences = 0;
 
 	public LexParser() {
 		lp = new LexicalizedParser("parsers/englishPCFG.ser.gz");
@@ -26,6 +29,7 @@ public class LexParser {
 	public List<Tree> parseArticle(AbstractDB article) {
 		// TODO Auto-generated method stub
 
+		sentences = 0;
 		System.out.println("Parsing started");
 		
 		String articleContent = ((ArticleDetails)article).getArticleContent();
@@ -42,7 +46,10 @@ public class LexParser {
 		Reader input = new StringReader(articleContent);
 		DocumentPreprocessor dp = new DocumentPreprocessor(input);
 		for (List<HasWord> sentence : dp) {
+			if(sentences >= sentencesLimit)
+				break;
 			parse.add(lp.apply(sentence));
+			sentences++;
 		}
 		
 		if(ConfigurationConstants.debugMode)

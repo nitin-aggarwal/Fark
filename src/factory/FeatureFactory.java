@@ -1,6 +1,7 @@
 package factory;
 
 import features.Feature;
+import features.PageRank;
 import features.ParserPCFG;
 import features.SentenceCohesion;
 import features.ngrams.BiGram;
@@ -24,6 +25,8 @@ public class FeatureFactory {
 			return ParserPCFG.getInstance();
 		else if(feature.equals("coherence"))
 			return SentenceCohesion.getInstance();
+		else if(feature.equals("pageRank"))
+			return PageRank.getInstance();
 		else
 			return null;
 	}

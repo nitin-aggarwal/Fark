@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -19,7 +20,7 @@ class GeneratePOSFile {
 	private static POSTagger tagger;
 	
 	// Contains articleId for the articles that are already tagged
-	private static HashSet<Integer> posTagged = new HashSet<Integer>();
+	private static HashSet<Integer> posTagged = null;
 
 	/**
 	 * Fetch articles from database and then tag the article content using
@@ -28,22 +29,63 @@ class GeneratePOSFile {
 
 	public static void tagArticles() {
 		long count = 0;
-		String[] tags = { "amusing", "cool", "obvious", "interesting" };
+		String[] tags = { "interesting", "interesting","amusing", "cool", "obvious"};
 
 		// Fetch all the articles form the database with required tags
 		List<AbstractDB> articleList = RetrieveDataSrv.retrieveRecords(
 				"ArticleDetails", tags);
 		System.out.println("Size of dataset: " + articleList.size());
+		
+		// Map to keep count of documents processed for each tag
+		HashMap<String,Integer> countTag = new HashMap<String, Integer>();
+		for(String s: tags)
+			countTag.put(s, 0);
+		
+		long totalCount = 0;
+		int tagCount = tags.length;
+		long records = 5050;
 
 		for (AbstractDB article : articleList) {
 			try {
 				int articleId = ((ArticleDetails) article).getId();
-				System.out.println("Tagging article: " + articleId);
-
+				
+				totalCount = 0;
+            	for(String tag: countTag.keySet())
+            		totalCount += countTag.get(tag);
+            	
+            	if(totalCount == tagCount*records)
+            		break;
+            	
+            	++count;
+    			if(count % 10 == 0)	{
+    				System.out.println(count);
+    				for(String str: countTag.keySet())
+    					System.out.println(str +" : "+countTag.get(str));
+    			}
+    			
+            	String articleTag = ((ArticleDetails)article).getFarkTag().toLowerCase();
+            	int tempCount = 0;
+            	if(countTag.keySet().contains(articleTag))
+    			{
+            		if(countTag.get(articleTag) < records)
+            		{
+            			tempCount = countTag.get(articleTag);
+            			countTag.remove(articleTag);
+            			countTag.put(articleTag, tempCount + 1);
+            		}
+            		else
+            			continue;
+    			}
+            	else
+            		continue;
+            	
 				// If article is already tagged, skip the tagging
 				if (posTagged.contains(articleId))
 					continue;
 
+				
+				System.out.println("Tagging article: " + articleId+ " "+ articleTag);
+				
 				// POS tagged the article
 				StringBuilder strPOS = tagger.tagArticles(article);
 
@@ -104,6 +146,11 @@ class GeneratePOSFile {
 			File dir = new File(parentDirectoryPath.toString());
 			String[] files = dir.list();
 			System.out.println("files: " + files.length);
+			
+			// Provided the size of hashSet to avoid resizing of bucket
+			// with new elements, as number of elements is pre-known
+			posTagged = new HashSet<Integer>(files.length);
+			
 			for (String s : files)
 				posTagged.add(Integer.parseInt(s.replace(".txt", "")));
 		} catch (Exception e) {

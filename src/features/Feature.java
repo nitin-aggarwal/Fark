@@ -6,5 +6,13 @@ import java.io.IOException;
 import entities.AbstractDB;
 
 abstract public class Feature {
-	abstract public void calculateFeatureVector(AbstractDB object, StringBuilder strPOS, File file) throws IOException;
+	abstract public void calculateFeatureVector(AbstractDB object, StringBuilder strPOS, File file) 
+			throws IOException;
+	public void print()	{
+		
+	}
+	
+	public void writeFile()	{
+		
+	}
 }

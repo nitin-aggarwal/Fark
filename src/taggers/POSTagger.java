@@ -45,9 +45,11 @@ public class POSTagger {
 		BreakIterator boundary = BreakIterator.getSentenceInstance(Locale.US);
         boundary.setText(articleContent);
         int start = boundary.first();
-	     for (int end = boundary.next();end != BreakIterator.DONE;start = end, end = boundary.next()) {
-	    	 strPOS.append(tagger.tagString(articleContent.substring(start,end)) +"\n");
-	     }	
+        for (int end = boundary.next();end != BreakIterator.DONE;start = end, end = boundary.next()) {
+        	if (ConfigurationConstants.debugMode)
+				System.out.println(articleContent.substring(start,end));
+	    	strPOS.append(tagger.tagString(articleContent.substring(start,end)) +"\n");
+	    }	
 					
 		strPOS.setLength(strPOS.length()-1);
 		if(ConfigurationConstants.debugMode)	{
