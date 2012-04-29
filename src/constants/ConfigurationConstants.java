@@ -29,8 +29,12 @@ public class ConfigurationConstants {
     
     public static final String UNIQUE_FEATURE_DIRECTORY = "uniqueNGramFeatures";
     
-    public static final boolean debugMode = false;
+    public static final boolean debugMode = true;
     
     public static final String[] FOLDER_NAMES = {"unigramWord"};//, "unigramWord","bigramPOS", "trigramPOS"};
+    
+    public static final String[] VALID_TAGS = {"JJ","JJR","JJS","VBD","VBN","VBD","NNP","NN","NNPS","NNS"};
+    
+    public static final String[] REPETITIVE_VERBS = {"was","were","had","have","said","did","been","is","am","are"};
 }
 //"news.yahoo.com", "cnn.com",
