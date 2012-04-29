@@ -4,6 +4,7 @@ import features.Feature;
 import features.PageRank;
 import features.ParserPCFG;
 import features.SentenceCohesion;
+import features.TextRank;
 import features.ngrams.BiGram;
 import features.ngrams.TriGram;
 import features.ngrams.UniGram;
@@ -27,6 +28,8 @@ public class FeatureFactory {
 			return SentenceCohesion.getInstance();
 		else if(feature.equals("pageRank"))
 			return PageRank.getInstance();
+		else if(feature.equals("textRank"))
+			return TextRank.getInstance();
 		else
 			return null;
 	}

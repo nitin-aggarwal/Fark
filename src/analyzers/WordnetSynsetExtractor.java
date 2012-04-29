@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -53,7 +52,7 @@ public class WordnetSynsetExtractor {
 		for(String verb:ConfigurationConstants.REPETITIVE_VERBS)
 			repetitiveVerbs.put(verb, dummyObject);
 		
-		
+		System.setProperty("wordnet.database.dir", "/home/nitin/git/Fark/src/dict");
 	}
 	
 	public static void main(String[] args) {
@@ -61,11 +60,6 @@ public class WordnetSynsetExtractor {
 		
 		
 		String word = "amusing";
-		System.setProperty("wordnet.database.dir", "/home/ca/LinguisticsProject/WordNet-3.0/dict");
-		
-		
-		// for getting tag-specific synsets and a word
-
 		//getPOSWordsFromArticles("amusing");
 		//calculateAll("amusingSynset.txt");
 		//getPOSWordsFromArticles("cool");
@@ -302,6 +296,21 @@ public class WordnetSynsetExtractor {
 		}
 	
 	}
+	
+	public static Set<String> getDefinition(String word)
+	{
+		Set<String> definitionWordSet = new HashSet<String>();
+		Synset synset = getMaxTagCount(word);
+		if(synset != null)	{
+			String definition = synset.getDefinition();
+			String[] definitionWords = definition.split(" ");
+			for(String definitionWord:definitionWords)
+			{
+				definitionWordSet.add(definitionWord);
+			}
+		}
+		return definitionWordSet;
+	}
 
 
 
@@ -486,6 +495,39 @@ public class WordnetSynsetExtractor {
 		
 	}
 
+	
+	private static Synset getMaxTagCount(String word)
+	{
+		Synset[] synsets = database.getSynsets(word,null);
+		Synset targetSynset = null;
+		int max = 0;
+		for(Synset synset:synsets)
+		{
+			//System.out.println(synset.getDefinition());
+			int frequencyCount;
+			try
+			{
+				frequencyCount = synset.getTagCount(word);
+			
+			//System.out.println(frequencyCount);
+			if(max < frequencyCount)
+			{
+				targetSynset = synset;
+				max = frequencyCount;
+			}
+			//System.out.println();
+			}
+			catch(Exception e)
+			{
+				//e.printStackTrace();
+			}
+		}
+		if(max == 0 && synsets.length != 0)
+		{
+			targetSynset = synsets[0];
+		}
+		return targetSynset;
+	}
 
 	private static void  calculateTagCount(String word,WordNetDatabase database)
 	{
