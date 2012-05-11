@@ -29,7 +29,7 @@ class TextRanker {
 		long totalCount = 0;
 		long count = 0;
 		int tagCount = tags.length;
-		long records = 5;
+		long records = 5000;
 
 		// Fetch all the articles from the ArticleDetails table, for the above specified tags
 		List<AbstractDB> articleList = RetrieveDataSrv.retrieveRecords("ArticleDetails", tags);
@@ -93,5 +93,6 @@ class TextRanker {
 		Feature feature;
 		feature = FeatureFactory.createFeatureVector("textRank");
 		feature.print();
+		feature.writeFile("textRankUnique1");
 	}
 }

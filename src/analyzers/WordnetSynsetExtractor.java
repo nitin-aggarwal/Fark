@@ -52,7 +52,7 @@ public class WordnetSynsetExtractor {
 		for(String verb:ConfigurationConstants.REPETITIVE_VERBS)
 			repetitiveVerbs.put(verb, dummyObject);
 		
-		System.setProperty("wordnet.database.dir", "/home/nitin/git/Fark/src/dict");
+		System.setProperty("wordnet.database.dir", "lib/dict");
 	}
 	
 	public static void main(String[] args) {

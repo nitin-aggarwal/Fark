@@ -29,7 +29,7 @@ class Parser {
 		long totalCount = 0;
 		long count = 0;
 		int tagCount = tags.length;
-		long records = 500;
+		long records = 2500;
 
 		// Fetch all the articles from the ArticleDetails table, for the above specified tags
 		List<AbstractDB> articleList = RetrieveDataSrv.retrieveRecords("ArticleDetails", tags);

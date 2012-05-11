@@ -93,5 +93,6 @@ class PageRanker {
 		Feature feature;
 		feature = FeatureFactory.createFeatureVector("pageRank");
 		feature.print();
+		feature.writeFile("pageRankUnique");
 	}
 }

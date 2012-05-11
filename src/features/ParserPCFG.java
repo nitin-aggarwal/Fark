@@ -5,10 +5,9 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import constants.ConfigurationConstants;
-
 import parsers.LexParser;
 import services.InsertDataSrv;
+import constants.ConfigurationConstants;
 import edu.stanford.nlp.trees.Tree;
 import entities.AbstractDB;
 import entities.ArticleDetails;
@@ -53,14 +52,21 @@ public class ParserPCFG extends Feature	{
 	public void calculateFeatureVector(AbstractDB object, StringBuilder strPOS, File file)
 			throws IOException {
 		// TODO Auto-generated method stub
-		
+		List<Tree> parseSentences = null;
+		// Parse the article content
+		try	{
+			parseSentences = parser.parseArticle(object);
+		}
+		catch(OutOfMemoryError e)	{
+			System.gc();
+			System.out.println("Parsing failed");
+			return;
+		}
 		InsertDataSrv.beginTransaction();
 		
 		pd = new ParseDetails();
 		pd.setId(((ArticleDetails) object).getId());
 		
-		// Parse the article content
-		List<Tree> parseSentences = parser.parseArticle(object);
 		compute(parseSentences);
 		
 		// Update the attributes

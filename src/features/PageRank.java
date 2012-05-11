@@ -1,15 +1,19 @@
 package features;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+
+import constants.ConfigurationConstants;
 
 import entities.AbstractDB;
 import entities.ArticleDetails;
@@ -233,5 +237,30 @@ public class PageRank extends Feature{
 		}
 		System.out.println("\nSize of keyset: "+distinct.size());
 		
+	}
+	
+	public void writeFile(String filename)
+	{
+		StringBuilder parentDirectoryPath =  new StringBuilder(System.getProperty("user.dir"));
+		parentDirectoryPath.append(File.separator).append("files"); 
+		
+		// Distinct file in folder uniqueNGramFeatures
+		File uniqueFile = new File(parentDirectoryPath +(new StringBuilder()).append(File.separator).
+				append(ConfigurationConstants.UNIQUE_FEATURE_DIRECTORY).append(File.separator).append(filename).toString());
+		
+		BufferedWriter bw;
+		try {
+			bw = new BufferedWriter(new FileWriter(uniqueFile));
+			for(String word: distinct)	{
+				bw.write(word);
+				bw.write("\n");
+			}
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("\nSize of keyset: "+distinct.size());
 	}
 }

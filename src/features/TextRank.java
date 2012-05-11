@@ -1,9 +1,11 @@
 package features;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,6 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import analyzers.WordnetSynsetExtractor;
+import constants.ConfigurationConstants;
 import entities.AbstractDB;
 import entities.ArticleDetails;
 import generics.StopWords;
@@ -64,7 +67,7 @@ public class TextRank extends Feature{
 			ranks.add(words.get(keyword));
 		Collections.sort(ranks);
 		if(ranks.size() > 0)
-			threshold = ranks.get((int)(ranks.size()*0.85));
+			threshold = ranks.get((int)(ranks.size()*0.9));
 		
 		for(String keyword: words.keySet())	{
 			if(words.get(keyword) >= threshold)
@@ -149,7 +152,7 @@ public class TextRank extends Feature{
 
 	/** Text Rank Algorithm Implementation */
 	public static void iterateTextRank() {
-		int iterations = 15;
+		int iterations = 10;
 		
 		// HashMap to store the iterations intermediate results
 		HashMap<String,Double> inter = new HashMap<String,Double>();
@@ -183,7 +186,7 @@ public class TextRank extends Feature{
 					}
 				}
 				temp.put(word,count);
-				System.out.println("Calculated");
+				//System.out.println("Calculated");
 			}
 			
 			// Compute the Text ranks
@@ -238,6 +241,30 @@ public class TextRank extends Feature{
 			i++;
 		}
 		System.out.println("\nSize of keyset: "+distinct.size());
+		
+	}
+	public void writeFile(String filename)
+	{
+		StringBuilder parentDirectoryPath =  new StringBuilder(System.getProperty("user.dir"));
+		parentDirectoryPath.append(File.separator).append("files"); 
+		
+		// Distinct file in folder uniqueNGramFeatures
+		File uniqueFile = new File(parentDirectoryPath +(new StringBuilder()).append(File.separator).
+				append(ConfigurationConstants.UNIQUE_FEATURE_DIRECTORY).append(File.separator).append(filename).toString());
+		
+		BufferedWriter bw;
+		try {
+			bw = new BufferedWriter(new FileWriter(uniqueFile));
+			for(String word: distinct)	{
+				bw.write(word);
+				bw.write("\n");
+			}
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 }

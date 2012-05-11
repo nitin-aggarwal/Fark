@@ -12,7 +12,7 @@ abstract public class Feature {
 		
 	}
 	
-	public void writeFile()	{
+	public void writeFile(String filename)	{
 		
 	}
 }
