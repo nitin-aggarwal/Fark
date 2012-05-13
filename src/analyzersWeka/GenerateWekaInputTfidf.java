@@ -8,11 +8,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 import services.RetrieveDataSrv;
-import constants.ConfigurationConstants;
 import entities.AbstractDB;
 import entities.ArticleDetails;
 

@@ -15,7 +15,6 @@ import services.RetrieveDataSrv;
 import constants.ConfigurationConstants;
 import entities.AbstractDB;
 import entities.ArticleDetails;
-import entities.CohesionDetails;
 
 /**
  * Combined two unique files

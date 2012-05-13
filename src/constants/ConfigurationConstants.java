@@ -21,13 +21,16 @@ public class ConfigurationConstants {
     public static final String TAGGING_TYPE = "pos";
     
     public static final String FILE_DIRECTORY_PATH = "files/";   
+    public static final String STATS_DIRECTORY_PATH = "stats/";   
+    
+    public static final String UNIQUE_FEATURE_DIRECTORY = "distinct";
+    public static final String UNIQUE_FEATURECOUNT_DIRECTORY = "count";
+    public static final String UNIQUE_SEED_DIRECTORY = "seed";
     
     public static final String NGRAM_FEATURES = "unigramPOS";//,"unigramWord","bigramPOS", "trigramPOS"};
    
     // add sites
     public static final String[] sites = {"others"};
-    
-    public static final String UNIQUE_FEATURE_DIRECTORY = "uniqueNGramFeatures";
     
     public static final boolean debugMode = false;
     
