@@ -30,7 +30,6 @@ public class WordnetSynsetExtractor {
 	/**
 	 * @param args
 	 */
-	
 	private static HashMap<String,Object> considerableTags = new HashMap<String, Object>();
 	private static HashMap<String,Object> seedWordSet = new HashMap<String,Object>(); 
 	private static Object dummyObject = new Object();

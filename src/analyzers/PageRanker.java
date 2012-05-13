@@ -17,63 +17,45 @@ class PageRanker {
 	 * Fetch articles from database and then compute keywords using
 	 * PageRank Algorithm
 	 */
-	public static void pageRankArticles() {
+	private static void pageRankArticles() {
 		
 		String[] tags = { "amusing" , "cool", "obvious", "interesting" };
+		int tagCount = tags.length;
+		long records = 5000;
 		
 		// Map to keep count of documents processed for each tag
 		HashMap<String,Integer> countTag = new HashMap<String, Integer>();
 		for(String s: tags)
 			countTag.put(s, 0);
 		
-		long totalCount = 0;
-		long count = 0;
-		int tagCount = tags.length;
-		long records = 5000;
-
-		// Fetch all the articles from the ArticleDetails table, for the above specified tags
+		long articlesObserved = 0;
+		long articlesProcessed = 0;
+		
+		// Retrieve all the records from the database with the required criteria
 		List<AbstractDB> articleList = RetrieveDataSrv.retrieveRecords("ArticleDetails", tags);
-		System.out.println("Size of article dataset: " + articleList.size());
-
+		System.out.println("Size of dataset: "+articleList.size());
+		
 		for (AbstractDB article : articleList) {
 			
-			int articleId = ((ArticleDetails) article).getId();
-			System.out.println("Processing article: "+articleId);
-			
-			totalCount = 0;
-			// Total count for parsed articles
-        	for(String tag: countTag.keySet())
-        		totalCount += countTag.get(tag);
-        	
-        	if(totalCount == tagCount*records)
-        		break;
-        	
-        	// count refers to articles processed (includes the one not parsed)
-        	++count;
-			if(totalCount % 100 == 0)	{
-				System.out.println("Processed: "+count);
-				for(String str: countTag.keySet())
-					System.out.println(str +" : "+countTag.get(str));
-			}
+			++articlesObserved;
+			if(articlesProcessed == tagCount*records)
+            	break;
 			
         	String articleTag = ((ArticleDetails)article).getFarkTag().toLowerCase();
-        	int tempCount = 0;
-        	if(countTag.keySet().contains(articleTag))
-			{
+        	if(countTag.keySet().contains(articleTag))	{
         		if(countTag.get(articleTag) < records)
-        		{
-        			tempCount = countTag.get(articleTag);
-        			countTag.remove(articleTag);
-        			countTag.put(articleTag, tempCount + 1);
-        		}
+        			countTag.put(articleTag, countTag.get(articleTag) + 1);
         		else
         			continue;
 			}
         	else
         		continue;
-
+			
 			calculateFeatures(article, "pageRank");
+			++articlesProcessed;
 		}
+		System.out.println("Total records considered: "+articlesObserved);
+		System.out.println("Total records processed: "+articlesProcessed);
 	}
 	
 	private static void calculateFeatures(AbstractDB article, String featureType) {
@@ -93,6 +75,6 @@ class PageRanker {
 		Feature feature;
 		feature = FeatureFactory.createFeatureVector("pageRank");
 		feature.print();
-		feature.writeFile("pageRankUnique");
+		feature.writeFile("pageRankUnique0");
 	}
 }

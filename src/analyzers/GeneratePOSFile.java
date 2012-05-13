@@ -26,8 +26,7 @@ class GeneratePOSFile {
 	 * Fetch articles from database and then tag the article content using
 	 * Stanford POS tagger and dump in a file in posDocs folder
 	 */
-
-	public static void tagArticles() {
+	private static void tagArticles() {
 		long count = 0;
 		String[] tags = { "interesting", "interesting","amusing", "cool", "obvious"};
 
@@ -157,7 +156,6 @@ class GeneratePOSFile {
 			System.out.println("Exception: " + e.getMessage());
 			return;
 		}
-
 	}
 
 	public static void main(String args[]) {

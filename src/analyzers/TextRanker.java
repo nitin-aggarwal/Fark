@@ -93,6 +93,6 @@ class TextRanker {
 		Feature feature;
 		feature = FeatureFactory.createFeatureVector("textRank");
 		feature.print();
-		feature.writeFile("textRankUnique1");
+		feature.writeFile("textRankUnique5");
 	}
 }

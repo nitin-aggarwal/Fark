@@ -150,13 +150,23 @@ public class GenerateDocCount
 		long[] instances = {5000};
 		String tags = "amusing cool interesting obvious";
 		for(long instance: instances)	{
-			compute("StopWordC"+instance,"stopWords3","unigramWord",instance,tags.split(" "));
+			compute("stopWords3","stopWords3","unigramWord",instance,tags.split(" "));
 			compute("UnigramWord"+instance,"UnigramWord"+instance,"unigramWord",instance,tags.split(" "));
 			compute("UnigramWordA"+instance,"UnigramWordA"+instance,"unigramWord",instance,tags.split(" "));
 			compute("UnigramWordB"+instance,"UnigramWordB"+instance,"unigramWord",instance,tags.split(" "));
 			compute("UnigramWordC"+instance,"UnigramWordC"+instance,"unigramWord",instance,tags.split(" "));
-			compute("UnigramPRank"+instance,"pageRankUnique"+instance,"unigramWord",instance,tags.split(" "));
-			compute("UnigramTRank"+instance,"textRankUnique"+instance,"unigramWord",instance,tags.split(" "));
+			compute("UnigramPOS"+instance,"UnigramPOS"+instance,"unigramPOS",instance,tags.split(" "));
+			compute("BigramPOS"+instance,"BigramPOS"+instance,"bigramPOS",instance,tags.split(" "));
+			compute("TrigramPOS"+instance,"TrigramPOS"+instance,"trigramPOS",instance,tags.split(" "));
+			compute("pageRankUnique0","pageRankUnique0","unigramWord",instance,tags.split(" "));
+			compute("pageRankUnique1","pageRankUnique1","unigramWord",instance,tags.split(" "));
+			compute("textRankUnique","textRankUnique","unigramWord",instance,tags.split(" "));
+			compute("DocTags"+instance+"-Top35K","DocTags"+instance+"-Top35K","unigramWord",instance,"amusing cool interesting obvious".split(" "));
+			compute("CountTags"+instance+"-Top35K","CountTags"+instance+"-Top35K","unigramWord",instance,"amusing cool interesting obvious".split(" "));
+			compute("DocCat10K","DocCat10K","unigramWord",instance,"amusing cool interesting obvious".split(" "));
+			compute("CountCat10K","CountCat10K","unigramWord",instance,"amusing cool interesting obvious".split(" "));
+			compute("DocCat20K","DocCat20K","unigramWord",instance,"amusing cool interesting obvious".split(" "));
+			compute("CountCat20K","CountCat20K","unigramWord",instance,"amusing cool interesting obvious".split(" "));
 		}
 	}
 }

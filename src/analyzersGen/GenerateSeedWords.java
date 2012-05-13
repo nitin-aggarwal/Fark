@@ -3,19 +3,20 @@ package analyzersGen;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import constants.ConfigurationConstants;
-
 import services.RetrieveDataSrv;
+import constants.ConfigurationConstants;
 import entities.AbstractDB;
 import entities.ArticleDetails;
 import generics.StopWords;
@@ -188,6 +189,51 @@ public class GenerateSeedWords
 		compute("CountInteresting5000","unigramWord",5000,"interesting".split(" "),true, false);
 		compute("CountTags5000","unigramWord",5000,"amusing cool interesting obvious".split(" "),true, false);
 		compute("CountTags5000-Top35K","unigramWord",5000,"amusing cool interesting obvious".split(" "),true, true);
+		
+		computeSeedCategory("CountCat20K", "Count", "Amusing Cool Interesting Obvious".split(" "), 20000);
+		computeSeedCategory("DocCat20K", "Doc", "Amusing Cool Interesting Obvious".split(" "), 20000);
+	}
+	
+	private static void computeSeedCategory(String filename, String type, String[] category, long instances)	{
+		BufferedReader br = null;
+		HashSet<String> seed = new HashSet<String>();
+		StringBuilder parentDirectoryPath =  new StringBuilder(System.getProperty("user.dir"));
+		File file = new File(parentDirectoryPath +(new StringBuilder()).
+				append(File.separator).append(ConfigurationConstants.STATS_DIRECTORY_PATH). 
+				append(File.separator).append(ConfigurationConstants.UNIQUE_SEED_DIRECTORY).
+				append(File.separator).append(filename).toString());
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+		
+			for(String tag: category)	{
+				File seedFile = new File(parentDirectoryPath +(new StringBuilder()).
+					append(File.separator).append(ConfigurationConstants.STATS_DIRECTORY_PATH). 
+					append(File.separator).append(ConfigurationConstants.UNIQUE_SEED_DIRECTORY).
+					append(File.separator).append(type+tag+"5000").toString());
+			
+				br = new BufferedReader(new FileReader(seedFile));
+				String line = null;
+				long count = 0;
+				while((line = br.readLine())!=null){
+					seed.add(line.split(" ")[0]);
+					count++;
+					if(count == instances)
+						break;
+				}
+				br.close();
+			}
+			for(String keyword: seed)
+				bw.write(keyword+"\n");
+			bw.close();
+		}
+		catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+		} 
+		catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+		}
 	}
 }
 class ValueComparator implements Comparator<String>	{

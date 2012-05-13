@@ -16,7 +16,7 @@ import entities.AbstractDB;
 import entities.ArticleDetails;
 
 
-public class GenerateWekaInputBinary 
+public class GenerateWekaInputCount 
 {
 	/** It holds all the word, count pairs for an article at a time */
 	private static HashMap<String,Integer> map = new HashMap<String, Integer>();
@@ -39,7 +39,7 @@ public class GenerateWekaInputBinary
 		
 		File wekaFile = new File(parentDirectoryPath +(new StringBuilder()).
 				append(File.separator).append(ConfigurationConstants.STATS_DIRECTORY_PATH). 
-				append(File.separator).append(ConfigurationConstants.WEKA_BINARY_DIRECTORY).
+				append(File.separator).append(ConfigurationConstants.WEKA_COUNT_DIRECTORY).
 				append(File.separator).append(filename).toString());
 		System.out.println("Generating Weka File: "+wekaFile);
 		
@@ -142,7 +142,7 @@ public class GenerateWekaInputBinary
 	    			{
 	    				value = map.get(str);
 	    				if(value != null)
-	    					result.append(varCount+" "+1).append(",");
+	    					result.append(varCount+" "+value).append(",");
 	    				varCount++;
 	    			}
 	    			result.append(varCount+" ");

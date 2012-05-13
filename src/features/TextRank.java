@@ -19,6 +19,12 @@ import entities.AbstractDB;
 import entities.ArticleDetails;
 import generics.StopWords;
 
+/**
+ * Implements TextRank algorithm to identify important keywords within a a document,
+ * considering closed class word as a node.
+ * Identify importance of keywords, and then consider all the
+ * keywords in the top 10% threshold over all the keywords
+ */
 public class TextRank extends Feature{
 
 	private static TextRank textRank = null;
@@ -67,7 +73,7 @@ public class TextRank extends Feature{
 			ranks.add(words.get(keyword));
 		Collections.sort(ranks);
 		if(ranks.size() > 0)
-			threshold = ranks.get((int)(ranks.size()*0.9));
+			threshold = ranks.get((int)(ranks.size()*0.95));
 		
 		for(String keyword: words.keySet())	{
 			if(words.get(keyword) >= threshold)
@@ -126,7 +132,8 @@ public class TextRank extends Feature{
 			String[] str = temp.split("/");
 			if (str.length == 2 && pos.contains(str[1]))	{
 				// Exclude all words with special characters
-				if(!str[0].matches(".*[0-9].*") && !str[0].matches(".*[\\W].*")){		
+				if(!str[0].matches(".*[0-9].*") && !str[0].matches(".*[\\W].*")
+						&& !str[0].contains("_")){		
 					
 					stopWordFlag = false;
 					// Excluding all the stop words
@@ -138,7 +145,7 @@ public class TextRank extends Feature{
 					}
 					
 					Double b = 0.0;
-					if(!stopWordFlag){
+					if(!stopWordFlag && str[0].length() > 1){
 						if((b = words.get(str[0])) != null)
 							words.put(str[0],++b);
 						else
@@ -246,20 +253,18 @@ public class TextRank extends Feature{
 	public void writeFile(String filename)
 	{
 		StringBuilder parentDirectoryPath =  new StringBuilder(System.getProperty("user.dir"));
-		parentDirectoryPath.append(File.separator).append("files"); 
-		
-		// Distinct file in folder uniqueNGramFeatures
-		File uniqueFile = new File(parentDirectoryPath +(new StringBuilder()).append(File.separator).
-				append(ConfigurationConstants.UNIQUE_FEATURE_DIRECTORY).append(File.separator).append(filename).toString());
+		File uniqueFile = new File(parentDirectoryPath +(new StringBuilder()).
+				append(File.separator).append(ConfigurationConstants.STATS_DIRECTORY_PATH). 
+				append(File.separator).append(ConfigurationConstants.UNIQUE_FEATURE_DIRECTORY).
+				append(File.separator).append(filename).toString());
+		System.out.println("Processing data for Text Rank: "+filename);
 		
 		BufferedWriter bw;
 		try {
 			bw = new BufferedWriter(new FileWriter(uniqueFile));
-			for(String word: distinct)	{
-				bw.write(word);
+			for(String word: distinct)
+				bw.write(word+"\n");
 				bw.write("\n");
-			}
-			bw.flush();
 			bw.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

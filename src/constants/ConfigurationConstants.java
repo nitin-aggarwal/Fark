@@ -27,6 +27,14 @@ public class ConfigurationConstants {
     public static final String UNIQUE_FEATURECOUNT_DIRECTORY = "count";
     public static final String UNIQUE_SEED_DIRECTORY = "seed";
     
+    public static final String WEKA_COUNT_DIRECTORY = "wekaInputCount";
+    public static final String WEKA_BINARY_DIRECTORY = "wekaInputBinary";
+    public static final String WEKA_TFIDF_DIRECTORY = "wekaInputTFIDF";
+    
+    public static final String SVM_COUNT_DIRECTORY = "svmInputCount";
+    public static final String SVM_BINARY_DIRECTORY = "svmInputBinary";
+    public static final String SVM_TFIDF_DIRECTORY = "svmInputTFIDF";
+    
     public static final String NGRAM_FEATURES = "unigramPOS";//,"unigramWord","bigramPOS", "trigramPOS"};
    
     // add sites

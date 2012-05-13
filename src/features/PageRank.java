@@ -19,6 +19,12 @@ import entities.AbstractDB;
 import entities.ArticleDetails;
 import generics.StopWords;
 
+/**
+ * Implements PageRank algorithm to identify important keywords within a a document,
+ * considering each sentence as a page.
+ * Identify importance of sentences, and then consider all repeating
+ * keywords from the top on-fourth sentences of the document
+ */
 public class PageRank extends Feature{
 
 	private static PageRank pageRank = null;
@@ -39,6 +45,8 @@ public class PageRank extends Feature{
 	private static int countSentences = 0;
 	private static double damping = 0.85;
 	private static int wordThreshold = 1;
+	
+	private static long articleProcessed = 0;
 	
 	private PageRank() {
 	}
@@ -61,6 +69,8 @@ public class PageRank extends Feature{
 		if(!computePageRank(object))
 			return;
 		
+		articleProcessed++;
+		
 		double threshold = 0;
 		ArrayList<Double> ranks = new ArrayList<Double>();
 		
@@ -81,8 +91,6 @@ public class PageRank extends Feature{
 			for(String str: sets)	{
 				if((b = distinctCount.get(str))!= null)
 					distinctCount.put(str,++b);
-				else
-					distinctCount.put(str, 1);
 			}
 		}
 		
@@ -99,9 +107,11 @@ public class PageRank extends Feature{
 		
 		String filename = ((ArticleDetails) article).getId() + ".txt";
 		StringBuilder parentDirectoryPath =  new StringBuilder(System.getProperty("user.dir"));
-		parentDirectoryPath.append(File.separator).append("files"); 
-		
-		File f = new File(parentDirectoryPath +(new StringBuilder()).append(File.separator).append("posDocs").append(File.separator).append(filename).toString());
+		File f = new File(parentDirectoryPath +(new StringBuilder()).
+				append(File.separator).append(ConfigurationConstants.FILE_DIRECTORY_PATH). 
+				append(File.separator).append("posDocs").
+				append(File.separator).append(filename).toString());
+		System.out.println("Processing data for Unique Set: "+filename);
 		
 		String tempStr = "";
 		countSentences = 0;
@@ -236,19 +246,19 @@ public class PageRank extends Feature{
 			i++;
 		}
 		System.out.println("\nSize of keyset: "+distinct.size());
-		
+		System.out.println("Total records processed: "+articleProcessed);
 	}
 	
 	public void writeFile(String filename)
 	{
 		StringBuilder parentDirectoryPath =  new StringBuilder(System.getProperty("user.dir"));
-		parentDirectoryPath.append(File.separator).append("files"); 
+		File uniqueFile = new File(parentDirectoryPath +(new StringBuilder()).
+				append(File.separator).append(ConfigurationConstants.STATS_DIRECTORY_PATH). 
+				append(File.separator).append(ConfigurationConstants.UNIQUE_FEATURE_DIRECTORY).
+				append(File.separator).append(filename).toString());
+		System.out.println("Processing data for Page Rank: "+filename);
 		
-		// Distinct file in folder uniqueNGramFeatures
-		File uniqueFile = new File(parentDirectoryPath +(new StringBuilder()).append(File.separator).
-				append(ConfigurationConstants.UNIQUE_FEATURE_DIRECTORY).append(File.separator).append(filename).toString());
-		
-		BufferedWriter bw;
+		BufferedWriter bw = null;
 		try {
 			bw = new BufferedWriter(new FileWriter(uniqueFile));
 			for(String word: distinct)	{

@@ -1,4 +1,4 @@
-package analyzersWeka;
+package analyzersSVM;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -17,7 +17,7 @@ import entities.AbstractDB;
 import entities.ArticleDetails;
 
 
-public class GenerateWekaInput 
+public class GenerateSVMInputCount 
 {
 	Object dummyObject = new Object();
 	
@@ -46,12 +46,11 @@ public class GenerateWekaInput
 		String folder = srcDir;
 		long records = rcd;
 		
-		File file = new File(parentDirectoryPath +(new StringBuilder()).append(File.separator).append("wekaInputBinary").append(File.separator).append(filename).toString());
-		BufferedWriter bw = null;
-		bw = new BufferedWriter(new FileWriter(file));
-		
-		bw.write("@relation "+filename);
-		bw.write("\n");
+		File trainFile = new File(parentDirectoryPath +(new StringBuilder()).append(File.separator).append("svmInput").append(File.separator).append(filename+".dat").toString());
+		File testFile = new File(parentDirectoryPath +(new StringBuilder()).append(File.separator).append("svmInput").append(File.separator).append(filename+"Test.dat").toString());
+		BufferedWriter bw1,bw2 = null;
+		bw1 = new BufferedWriter(new FileWriter(trainFile));
+		bw2 = new BufferedWriter(new FileWriter(testFile));
 		
 		File uniqueFile = new File(parentDirectoryPath +(new StringBuilder()).append(File.separator).
 				append(ConfigurationConstants.UNIQUE_FEATURE_DIRECTORY).append(File.separator).append(unique).toString());
@@ -83,28 +82,16 @@ public class GenerateWekaInput
 		}
 		featureList.size();
 		
-		for(String str: featureList)
-		{
-			bw.write("@attribute \""+str+"\" numeric");
-			bw.write("\n");
-		}
-		
 		/*
 		 * A - Amusing
 		 * B - Interesting
 		 * C - Cool
 		 * D - Obvious
 		 */
-		bw.write("@attribute farkTag {A,B,C,D}");
-		bw.write("\n");
-		bw.write("\n");
-		bw.write("@data");
-		bw.write("\n");
-		
 		String[] tags = category;
 		int tagCount = tags.length;
 		
-		System.out.println("Processing data for generating weka file: "+filename);
+		System.out.println("Processing data for generating SVM file: "+filename);
 		
 		// Retrieve all the records from the database with the required criteria
 		List<AbstractDB> articleList = RetrieveDataSrv.retrieveRecords("ArticleDetails", tags);
@@ -119,6 +106,9 @@ public class GenerateWekaInput
 		HashMap<String,Integer> countTag = new HashMap<String, Integer>();
 		for(String s: tags)
 			countTag.put(s, 0);
+		
+		// Train or test
+		String recordStatus = null;
 		
 		for(AbstractDB article:articleList)
 		{
@@ -150,6 +140,10 @@ public class GenerateWekaInput
                 			tempCount = countTag.get(articleTag);
                 			countTag.remove(articleTag);
                 			countTag.put(articleTag, tempCount + 1);
+                			if(tempCount > rcd*0.8)
+                				recordStatus = "test";
+                			else
+                				recordStatus = "train";
                 		}
                 		else
                 			continue;
@@ -174,37 +168,44 @@ public class GenerateWekaInput
             		}
             		br.close();
             		
-
-        			Integer value;
+            		Integer value;
         			StringBuilder result = new StringBuilder();
-        			for(String str: featureList)
-        			{
-        				value = map.get(str);
-        				if(value == null)
-        					result.append(0).append(",");
-        				else
-        					result.append(1).append(",");
-        			}
         			
         			// 4-way classification
         			if(((ArticleDetails)article).getFarkTag().equalsIgnoreCase("amusing"))
         			{
-        				result.append("A");
+        				result.append("1 ");
         			}
         			else if(((ArticleDetails)article).getFarkTag().equalsIgnoreCase("interesting"))
         			{
-        				result.append("B");
+        				result.append("2 ");
         			}
         			else if(((ArticleDetails)article).getFarkTag().equalsIgnoreCase("cool"))
         			{
-        				result.append("C");
+        				result.append("3 ");
         			}
         			else if(((ArticleDetails)article).getFarkTag().equalsIgnoreCase("obvious"))
         			{
-        				result.append("D");
+        				result.append("4 ");
         			}
-        			bw.write(result.toString());
-        			bw.write("\n");
+        			
+        			int varCount = 1;
+        			for(String str: featureList)
+        			{
+        				value = map.get(str);
+        				if(value != null)
+        					result.append(varCount+":"+value+" ");
+        				varCount++;
+        			}
+        			if(recordStatus.compareTo("train") == 0)	{
+        				bw1.write(result.toString());
+        				bw1.write("\n");
+        			}
+        			else	{
+        				bw2.write(result.toString());
+        				bw2.write("\n");
+        			}
+        				
         			
         			map.clear();
             	} 
@@ -216,8 +217,10 @@ public class GenerateWekaInput
 		}
 		System.out.println("Total records processed: "+count);
 		System.out.println("Total records considered: "+totalCount);
-		bw.flush();
-		bw.close();
+		bw1.flush();
+		bw1.close();
+		bw2.flush();
+		bw2.close();
 		
 		featureList.clear();
 	}
@@ -228,58 +231,62 @@ public class GenerateWekaInput
 			// 4-way classification
 			
 			// UNIGRAM Words
-			
-			compute("UnigramWord100.arff","UnigramWord100","unigramWord",100,"amusing cool interesting obvious".split(" "));
-			compute("UnigramWord250.arff","UnigramWord250","unigramWord",250,"amusing cool interesting obvious".split(" "));
-			compute("UnigramWord500.arff","UnigramWord500","unigramWord",500,"amusing cool interesting obvious".split(" "));
-			compute("UnigramWord1000.arff","UnigramWord1000","unigramWord",1000,"amusing cool interesting obvious".split(" "));
+			compute("UnigramWord100","UnigramWord100","unigramWord",100,"amusing cool interesting obvious".split(" "));
+			compute("UnigramWord250","UnigramWord250","unigramWord",250,"amusing cool interesting obvious".split(" "));
+			compute("UnigramWord500","UnigramWord500","unigramWord",500,"amusing cool interesting obvious".split(" "));
+			compute("UnigramWord1000","UnigramWord1000","unigramWord",1000,"amusing cool interesting obvious".split(" "));
+			compute("UnigramWord2000","UnigramWord2000","unigramWord",2000,"amusing cool interesting obvious".split(" "));
+			compute("UnigramWord5000","UnigramWord5000","unigramWord",5000,"amusing cool interesting obvious".split(" "));
 			
 			
 			// UNIGRAM POS
-			compute("UnigramPOS500.arff","UnigramPOS500","unigramPOS",500,"amusing cool interesting obvious".split(" "));
-			compute("UnigramPOS1000.arff","UnigramPOS1000","unigramPOS",1000,"amusing cool interesting obvious".split(" "));
-			compute("UnigramPOS2500.arff","UnigramPOS2500","unigramPOS",2500,"amusing cool interesting obvious".split(" "));
-			compute("UnigramPOS5000.arff","UnigramPOS5000","unigramPOS",5000,"amusing cool interesting obvious".split(" "));
+			compute("UnigramPOS500","UnigramPOS500","unigramPOS",500,"amusing cool interesting obvious".split(" "));
+			compute("UnigramPOS1000","UnigramPOS1000","unigramPOS",1000,"amusing cool interesting obvious".split(" "));
+			compute("UnigramPOS2500","UnigramPOS2500","unigramPOS",2500,"amusing cool interesting obvious".split(" "));
+			compute("UnigramPOS5000","UnigramPOS5000","unigramPOS",5000,"amusing cool interesting obvious".split(" "));
 			
 			// BIGRAM POS
-			compute("BigramPOS500.arff","BigramPOS500","bigramPOS",500,"amusing cool interesting obvious".split(" "));
-			compute("BigramPOS1000.arff","BigramPOS1000","bigramPOS",1000,"amusing cool interesting obvious".split(" "));
-			compute("BigramPOS2500.arff","BigramPOS2500","bigramPOS",2500,"amusing cool interesting obvious".split(" "));
-			compute("BigramPOS5000.arff","BigramPOS5000","bigramPOS",5000,"amusing cool interesting obvious".split(" "));
+			compute("BigramPOS500","BigramPOS500","bigramPOS",500,"amusing cool interesting obvious".split(" "));
+			compute("BigramPOS1000","BigramPOS1000","bigramPOS",1000,"amusing cool interesting obvious".split(" "));
+			compute("BigramPOS2500","BigramPOS2500","bigramPOS",2500,"amusing cool interesting obvious".split(" "));
+			compute("BigramPOS5000","BigramPOS5000","bigramPOS",5000,"amusing cool interesting obvious".split(" "));
 			
 			// TRIGRAM POS
-			compute("TrigramPOS100.arff","TrigramPOS100","trigramPOS",100,"amusing cool interesting obvious".split(" "));
-			compute("TrigramPOS250.arff","TrigramPOS250","trigramPOS",250,"amusing cool interesting obvious".split(" "));
-			compute("TrigramPOS400.arff","TrigramPOS400","trigramPOS",400,"amusing cool interesting obvious".split(" "));
-			compute("TrigramPOS500.arff","TrigramPOS500","trigramPOS",500,"amusing cool interesting obvious".split(" "));
+			compute("TrigramPOS100","TrigramPOS100","trigramPOS",100,"amusing cool interesting obvious".split(" "));
+			compute("TrigramPOS250","TrigramPOS250","trigramPOS",250,"amusing cool interesting obvious".split(" "));
+			compute("TrigramPOS400","TrigramPOS400","trigramPOS",400,"amusing cool interesting obvious".split(" "));
+			compute("TrigramPOS500","TrigramPOS500","trigramPOS",500,"amusing cool interesting obvious".split(" "));
+			compute("TrigramPOS1000","TrigramPOS1000","trigramPOS",1000,"amusing cool interesting obvious".split(" "));
+			compute("TrigramPOS2500","TrigramPOS2500","trigramPOS",2500,"amusing cool interesting obvious".split(" "));
+			compute("TrigramPOS4000","TrigramPOS4000","trigramPOS",4000,"amusing cool interesting obvious".split(" "));
+			compute("TrigramPOS5000","TrigramPOS5000","trigramPOS",5000,"amusing cool interesting obvious".split(" "));
 			
 			// STOP Words (174)
-			compute("StopWordA1000.arff","stopWords1","unigramWord",1000,"amusing cool interesting obvious".split(" "));
-			compute("StopWordA2000.arff","stopWords1","unigramWord",2000,"amusing cool interesting obvious".split(" "));
-			compute("StopWordA5000.arff","stopWords1","unigramWord",5000,"amusing cool interesting obvious".split(" "));
+			compute("StopWordA1000","stopWords1","unigramWord",1000,"amusing cool interesting obvious".split(" "));
+			compute("StopWordA2000","stopWords1","unigramWord",2000,"amusing cool interesting obvious".split(" "));
+			compute("StopWordA5000","stopWords1","unigramWord",5000,"amusing cool interesting obvious".split(" "));
 			
 			// STOP Words (543)
-			compute("StopWordB1000.arff","stopWords2","unigramWord",1000,"amusing cool interesting obvious".split(" "));
-			compute("StopWordB2000.arff","stopWords2","unigramWord",2000,"amusing cool interesting obvious".split(" "));
-			compute("StopWordB5000.arff","stopWords2","unigramWord",5000,"amusing cool interesting obvious".split(" "));
+			compute("StopWordB1000","stopWords2","unigramWord",1000,"amusing cool interesting obvious".split(" "));
+			compute("StopWordB2000","stopWords2","unigramWord",2000,"amusing cool interesting obvious".split(" "));
+			compute("StopWordB5000","stopWords2","unigramWord",5000,"amusing cool interesting obvious".split(" "));
 			
 			// STOP Words (667)
-			compute("StopWordC1000.arff","stopWords3","unigramWord",1000,"amusing cool interesting obvious".split(" "));
-			compute("StopWordC2000.arff","stopWords3","unigramWord",2000,"amusing cool interesting obvious".split(" "));
-			compute("StopWordC5000.arff","stopWords3","unigramWord",5000,"amusing cool interesting obvious".split(" "));
+			compute("StopWordC1000","stopWords3","unigramWord",1000,"amusing cool interesting obvious".split(" "));
+			compute("StopWordC2000","stopWords3","unigramWord",2000,"amusing cool interesting obvious".split(" "));
+			compute("StopWordC5000","stopWords3","unigramWord",5000,"amusing cool interesting obvious".split(" "));
 			
 			// PageRank UNIGRAMS
-			compute("UnigramPRank500.arff","pageRankUnique","unigramWord",500,"amusing cool interesting obvious".split(" "));
-			compute("UnigramPRank1000.arff","pageRankUnique","unigramWord",1000,"amusing cool interesting obvious".split(" "));
-			compute("UnigramPRank2500.arff","pageRankUnique","unigramWord",2500,"amusing cool interesting obvious".split(" "));
-			compute("UnigramPRank5000.arff","pageRankUnique","unigramWord",5000,"amusing cool interesting obvious".split(" "));
+			compute("UnigramPRank500","pageRankUnique","unigramWord",500,"amusing cool interesting obvious".split(" "));
+			compute("UnigramPRank1000","pageRankUnique","unigramWord",1000,"amusing cool interesting obvious".split(" "));
+			compute("UnigramPRank2500","pageRankUnique","unigramWord",2500,"amusing cool interesting obvious".split(" "));
+			compute("UnigramPRank5000","pageRankUnique","unigramWord",5000,"amusing cool interesting obvious".split(" "));
 			
 			// TextRank UNIGRAMS
-			compute("UnigramTRank500.arff","textRankUnique","unigramWord",500,"amusing cool interesting obvious".split(" "));
-			compute("UnigramTRank1000.arff","textRankUnique","unigramWord",1000,"amusing cool interesting obvious".split(" "));
-			compute("UnigramTRank2500.arff","textRankUnique","unigramWord",2500,"amusing cool interesting obvious".split(" "));
-			compute("UnigramTRank5000.arff","textRankUnique","unigramWord",5000,"amusing cool interesting obvious".split(" "));
-			
+			compute("UnigramTRank500","textRankUnique","unigramWord",500,"amusing cool interesting obvious".split(" "));
+			compute("UnigramTRank1000","textRankUnique","unigramWord",1000,"amusing cool interesting obvious".split(" "));
+			compute("UnigramTRank2500","textRankUnique","unigramWord",2500,"amusing cool interesting obvious".split(" "));
+			compute("UnigramTRank5000","textRankUnique","unigramWord",5000,"amusing cool interesting obvious".split(" "));
 			
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
