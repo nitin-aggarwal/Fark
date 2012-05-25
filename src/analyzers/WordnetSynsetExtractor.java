@@ -845,7 +845,7 @@ public class WordnetSynsetExtractor {
 		Iterator<Entry<String,Object>> iterator = set.iterator();
 		while(iterator.hasNext())
 		{
-			Entry entry = iterator.next();
+			Entry<String,Object> entry = iterator.next();
 			System.out.println(entry.getKey());
 		}
 		System.out.println(seedWordSet.size());
